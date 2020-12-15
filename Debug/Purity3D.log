@@ -1,0 +1,9 @@
+﻿  Purity3D.cpp
+Purity3D.obj : error LNK2019: nierozpoznany zewnętrzny symbol __imp__glViewport@16 przywołany w funkcji _main
+Purity3D.obj : error LNK2019: nierozpoznany zewnętrzny symbol _glfwInit przywołany w funkcji _main
+Purity3D.obj : error LNK2019: nierozpoznany zewnętrzny symbol _glfwTerminate przywołany w funkcji _main
+Purity3D.obj : error LNK2019: nierozpoznany zewnętrzny symbol _glfwWindowHint przywołany w funkcji _main
+Purity3D.obj : error LNK2019: nierozpoznany zewnętrzny symbol _glfwCreateWindow przywołany w funkcji _main
+Purity3D.obj : error LNK2019: nierozpoznany zewnętrzny symbol _glfwMakeContextCurrent przywołany w funkcji _main
+C:\Users\DomonX\source\repos\Purity3D\deps\GLFW\lib-vc2019\glfw3.lib : warning LNK4272: wystąpił konflikt typu maszyny biblioteki „x64” z typem maszyny docelowej „x86”
+C:\Users\DomonX\source\repos\Purity3D\Debug\Purity3D.exe : fatal error LNK1120: liczba nierozpoznanych elementów zewnętrznych: 6
