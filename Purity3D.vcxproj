@@ -165,11 +165,33 @@
   <ItemGroup>
     <ClCompile Include="..\deps\GLAD\src\glad.c" />
     <ClCompile Include="Purity3D.cpp" />
+    <ClCompile Include="src\shader.cpp" />
+    <ClCompile Include="src\stb.cpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="fragmentShader.glsl" />
+    <None Include="packages.config" />
     <None Include="vertexShader.glsl" />
   </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="libs\Camera.hpp" />
+    <ClInclude Include="libs\Component.hpp" />
+    <ClInclude Include="libs\Cube.hpp" />
+    <ClInclude Include="libs\GameObject.hpp" />
+    <ClInclude Include="libs\Model.hpp" />
+    <ClInclude Include="libs\shader.hpp" />
+    <ClInclude Include="libs\stb_image.h" />
+    <ClInclude Include="libs\Texture.hpp" />
+    <ClInclude Include="libs\Transform.hpp" />
+  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
-  <ImportGroup Label="ExtensionTargets" />
+  <ImportGroup Label="ExtensionTargets">
+    <Import Project="..\packages\glm.0.9.9.800\build\native\glm.targets" Condition="Exists('..\packages\glm.0.9.9.800\build\native\glm.targets')" />
+  </ImportGroup>
+  <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
+    <PropertyGroup>
+      <ErrorText>Ten projekt zawiera odwołania do pakietów NuGet, których nie ma na tym komputerze. Użyj przywracania pakietów NuGet, aby je pobrać. Aby uzyskać więcej informacji, zobacz http://go.microsoft.com/fwlink/?LinkID=322105. Brakujący plik: {0}.</ErrorText>
+    </PropertyGroup>
+    <Error Condition="!Exists('..\packages\glm.0.9.9.800\build\native\glm.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\glm.0.9.9.800\build\native\glm.targets'))" />
+  </Target>
 </Project>
