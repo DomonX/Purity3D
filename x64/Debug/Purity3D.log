@@ -1,3 +1,13 @@
-﻿  shader.cpp
+﻿  Purity3D.cpp
+C:\Users\DomonX\source\repos\Purity3D\Purity3D\libs\Transform.hpp(7,10): warning C4067: nieoczekiwane tokeny występujące po dyrektywie preprocesora - oczekiwano nowego wiersza
+C:\Users\DomonX\source\repos\Purity3D\Purity3D\libs\Transform.hpp(8,10): warning C4067: nieoczekiwane tokeny występujące po dyrektywie preprocesora - oczekiwano nowego wiersza
+C:\Users\DomonX\source\repos\Purity3D\Purity3D\Purity3D.cpp(149,22): warning C4244: "inicjowanie": konwersja z "double" do "float", możliwa utrata danych
+C:\Users\DomonX\source\repos\Purity3D\Purity3D\Purity3D.cpp(177,11): warning C4244: "=": konwersja z "double" do "float", możliwa utrata danych
+C:\Users\DomonX\source\repos\Purity3D\Purity3D\Purity3D.cpp(178,11): warning C4244: "=": konwersja z "double" do "float", możliwa utrata danych
+C:\Users\DomonX\source\repos\Purity3D\Purity3D\Purity3D.cpp(182,16): warning C4244: "inicjowanie": konwersja z "double" do "float", możliwa utrata danych
+C:\Users\DomonX\source\repos\Purity3D\Purity3D\Purity3D.cpp(183,16): warning C4244: "inicjowanie": konwersja z "double" do "float", możliwa utrata danych
+C:\Users\DomonX\source\repos\Purity3D\Purity3D\Purity3D.cpp(185,10): warning C4244: "=": konwersja z "double" do "float", możliwa utrata danych
+C:\Users\DomonX\source\repos\Purity3D\Purity3D\Purity3D.cpp(186,10): warning C4244: "=": konwersja z "double" do "float", możliwa utrata danych
+C:\Users\DomonX\source\repos\Purity3D\Purity3D\Purity3D.cpp(195,29): warning C4244: "argument": konwersja z "double" do "float", możliwa utrata danych
 C:\Users\DomonX\source\repos\Purity3D\Purity3D\libs\GameState.hpp(20): warning C4715: "GameState::get”: niewszystkie ścieżki kodu zwracają wartość
   Purity3D.vcxproj -> C:\Users\DomonX\source\repos\Purity3D\x64\Debug\Purity3D.exe

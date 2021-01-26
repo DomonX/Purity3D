@@ -25,6 +25,12 @@ public:
 	void setBool(const std::string &name, bool value) const;
 	void setInt(const std::string& name, int value) const;
 	void setFloat(const std::string& name, float value) const;
+	void setVec3(const std::string& name, const glm::vec3& value) const	{
+		glUniform3fv(glGetUniformLocation(id, name.c_str()), 1, &value[0]);
+	}
+	void setVec3(const std::string& name, float x, float y, float z) const {
+		glUniform3f(glGetUniformLocation(id, name.c_str()), x, y, z);
+	}
 
 	int getId();
 
@@ -43,7 +49,8 @@ public:
 		);
 		int projectionLoc = glGetUniformLocation(getId(), "projection");
 		glUniformMatrix4fv(projectionLoc, 1, GL_FALSE, glm::value_ptr(projection));
-		this->use();
+		setVec3("lightColor", 1.0f, 1.0f, 1.0f);
+		use();
 	}
 
 private:

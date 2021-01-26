@@ -172,6 +172,7 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="cubeFs.glsl" />
+    <None Include="lightFs.glsl" />
     <None Include="packages.config" />
     <None Include="cubeVs.glsl" />
   </ItemGroup>

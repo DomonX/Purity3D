@@ -19,20 +19,15 @@ protected:
 
 public:
 	Cube() {
-		glm::vec3 scale = glm::vec3(1.0f, 1.0f, 1.0f);
-		float xScale = scale.x / 2;
-		float yScale = scale.y / 2;
-		float zScale = scale.z / 2;
+		glm::vec3 c1 = glm::vec3(-0.5f, -0.5f, -0.5f);
+		glm::vec3 c2 = glm::vec3(0.5f, -0.5f, -0.5f);
+		glm::vec3 c3 = glm::vec3(0.5f, 0.5f, -0.5f);
+		glm::vec3 c4 = glm::vec3(-0.5f, 0.5f, -0.5f);
 
-		glm::vec3 c1 = glm::vec3(-xScale, -yScale, -zScale);
-		glm::vec3 c2 = glm::vec3(xScale, -yScale, -zScale);
-		glm::vec3 c3 = glm::vec3(xScale, yScale, -zScale);
-		glm::vec3 c4 = glm::vec3(-xScale, yScale, -zScale);
-
-		glm::vec3 c5 = glm::vec3(-xScale, -yScale, zScale);
-		glm::vec3 c6 = glm::vec3(xScale, -yScale, zScale);
-		glm::vec3 c7 = glm::vec3(xScale, yScale, zScale);
-		glm::vec3 c8 = glm::vec3(-xScale, yScale, zScale);
+		glm::vec3 c5 = glm::vec3(-0.5f, -0.5f, 0.5f);
+		glm::vec3 c6 = glm::vec3(0.5f, -0.5f, 0.5f);
+		glm::vec3 c7 = glm::vec3(0.5f, 0.5f, 0.5f);
+		glm::vec3 c8 = glm::vec3(-0.5f, 0.5f, 0.5f);
 
 		float cubeModel[] = {
 			c1.x, c1.y, c1.z, 0.0f, 0.0f,

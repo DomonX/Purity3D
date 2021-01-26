@@ -18,6 +18,7 @@
 #include "libs/GameState.hpp"
 #include "libs/RotatorContoller.hpp"
 #include "libs/Time.hpp"
+#include "libs/Light.hpp"
 
 void framebuffer_size_callback(GLFWwindow* window, int width, int height);
 void mouse_callback(GLFWwindow* window, double xpos, double ypos);
@@ -124,17 +125,24 @@ int main() {
 		glm::vec3(-1.3f, 1.0f, -1.5f)
 	};
 
+	Light* lightC = new Light();
+	Shader* lightShader = new Shader("cubeVs.glsl", "lightFs.glsl");
+	GameObject* light = new GameObject();
 	for (int i = 0; i < 10; i++) {
 		GameObject* obj = new GameObject();
 		obj->addComponent(c);
 		obj->addComponent(tex);
 		obj->addComponent(currentShader);
-		obj->addComponent(new Transform(cubePositions[i], vec3(1.0f, 1.0f, 1.0f), vec3(0.0f, 0.0f, 0.0f)));
+		vec3 scaleV = vec3(1.0f, 1.0f, 1.0f) + vec3(-0.5f + (float)i * 0.1f);
+		obj->addComponent(new Transform(cubePositions[i], scaleV, vec3(0.0f, 0.0f, 0.0f)));
 		float x = (float)i / 2;
 		float y = (float)i;
 		obj->addComponent(new RotatorController(glm::vec3(0.2f + x, 0.2f + y, 0)));
 		objts.push_back(obj);
 	}
+	light->addComponent(c);
+	light->addComponent(lightShader);
+	light->addComponent(new Transform(vec3(1.2f, 1.0f, 2.0f), vec3(0.2f), vec3(0.0f)));
 
 	while (!glfwWindowShouldClose(window)) {
 
@@ -145,12 +153,14 @@ int main() {
 
 		processInput(window);
 
-		glClearColor(1.0f, 0.5f, 1.0f, 1.0f);
+		glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 		for (GameObject* obj : objts) {
 			obj->onUpdate();
 		}
+		lightShader->use();
+		light->onUpdate();
 		
 		glfwSwapBuffers(window);
 		glfwPollEvents();
