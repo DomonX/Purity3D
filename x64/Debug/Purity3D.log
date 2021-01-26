@@ -1,12 +1,3 @@
-﻿  Purity3D.cpp
-C:\Users\DomonX\source\repos\Purity3D\Purity3D\Purity3D.cpp(138,22): warning C4244: "inicjowanie": konwersja z "double" do "float", możliwa utrata danych
-C:\Users\DomonX\source\repos\Purity3D\Purity3D\Purity3D.cpp(186,11): warning C4244: "=": konwersja z "double" do "float", możliwa utrata danych
-C:\Users\DomonX\source\repos\Purity3D\Purity3D\Purity3D.cpp(187,11): warning C4244: "=": konwersja z "double" do "float", możliwa utrata danych
-C:\Users\DomonX\source\repos\Purity3D\Purity3D\Purity3D.cpp(191,16): warning C4244: "inicjowanie": konwersja z "double" do "float", możliwa utrata danych
-C:\Users\DomonX\source\repos\Purity3D\Purity3D\Purity3D.cpp(192,16): warning C4244: "inicjowanie": konwersja z "double" do "float", możliwa utrata danych
-C:\Users\DomonX\source\repos\Purity3D\Purity3D\Purity3D.cpp(194,10): warning C4244: "=": konwersja z "double" do "float", możliwa utrata danych
-C:\Users\DomonX\source\repos\Purity3D\Purity3D\Purity3D.cpp(195,10): warning C4244: "=": konwersja z "double" do "float", możliwa utrata danych
-  shader.cpp
-  Generowanie kodu...
-C:\Users\DomonX\source\repos\Purity3D\Purity3D\Purity3D.cpp(204,28): warning C4244: "argument": konwersja z "double" do "float", możliwa utrata danych
+﻿  shader.cpp
+C:\Users\DomonX\source\repos\Purity3D\Purity3D\libs\GameState.hpp(20): warning C4715: "GameState::get”: niewszystkie ścieżki kodu zwracają wartość
   Purity3D.vcxproj -> C:\Users\DomonX\source\repos\Purity3D\x64\Debug\Purity3D.exe

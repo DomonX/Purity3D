@@ -165,23 +165,28 @@
   <ItemGroup>
     <ClCompile Include="..\deps\GLAD\src\glad.c" />
     <ClCompile Include="Purity3D.cpp" />
+    <ClCompile Include="src\GameState.cpp" />
     <ClCompile Include="src\shader.cpp" />
     <ClCompile Include="src\stb.cpp" />
+    <ClCompile Include="src\Time.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="fragmentShader.glsl" />
+    <None Include="cubeFs.glsl" />
     <None Include="packages.config" />
-    <None Include="vertexShader.glsl" />
+    <None Include="cubeVs.glsl" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="libs\Camera.hpp" />
     <ClInclude Include="libs\Component.hpp" />
     <ClInclude Include="libs\Cube.hpp" />
     <ClInclude Include="libs\GameObject.hpp" />
-    <ClInclude Include="libs\Model.hpp" />
+    <ClInclude Include="libs\GameState.hpp" />
+    <ClInclude Include="libs\Light.hpp" />
+    <ClInclude Include="libs\RotatorContoller.hpp" />
     <ClInclude Include="libs\shader.hpp" />
     <ClInclude Include="libs\stb_image.h" />
     <ClInclude Include="libs\Texture.hpp" />
+    <ClInclude Include="libs\Time.hpp" />
     <ClInclude Include="libs\Transform.hpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

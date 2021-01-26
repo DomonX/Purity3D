@@ -1,8 +1,8 @@
 #include "../libs/shader.hpp"
 Shader::Shader(const char* vertexPath, const char* fragmentPath) {
 
-	unsigned int vertexShader = compileShader("vertexShader.glsl", GL_VERTEX_SHADER);
-	unsigned int fragmentShader = compileShader("fragmentShader.glsl", GL_FRAGMENT_SHADER);
+	unsigned int vertexShader = compileShader(vertexPath, GL_VERTEX_SHADER);
+	unsigned int fragmentShader = compileShader(fragmentPath, GL_FRAGMENT_SHADER);
 
 	int success;
 	char infoLog[512];

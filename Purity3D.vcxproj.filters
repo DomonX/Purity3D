@@ -27,15 +27,21 @@
     <ClCompile Include="src\stb.cpp">
       <Filter>Pliki źródłowe</Filter>
     </ClCompile>
+    <ClCompile Include="src\GameState.cpp">
+      <Filter>Pliki źródłowe</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Time.cpp">
+      <Filter>Pliki źródłowe</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <None Include="fragmentShader.glsl">
-      <Filter>Pliki zasobów</Filter>
-    </None>
-    <None Include="vertexShader.glsl">
-      <Filter>Pliki zasobów</Filter>
-    </None>
     <None Include="packages.config" />
+    <None Include="cubeFs.glsl">
+      <Filter>Pliki zasobów</Filter>
+    </None>
+    <None Include="cubeVs.glsl">
+      <Filter>Pliki zasobów</Filter>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="libs\shader.hpp">
@@ -59,10 +65,19 @@
     <ClInclude Include="libs\Transform.hpp">
       <Filter>Pliki nagłówkowe</Filter>
     </ClInclude>
-    <ClInclude Include="libs\Model.hpp">
+    <ClInclude Include="libs\Texture.hpp">
       <Filter>Pliki nagłówkowe</Filter>
     </ClInclude>
-    <ClInclude Include="libs\Texture.hpp">
+    <ClInclude Include="libs\GameState.hpp">
+      <Filter>Pliki nagłówkowe</Filter>
+    </ClInclude>
+    <ClInclude Include="libs\RotatorContoller.hpp">
+      <Filter>Pliki nagłówkowe</Filter>
+    </ClInclude>
+    <ClInclude Include="libs\Time.hpp">
+      <Filter>Pliki nagłówkowe</Filter>
+    </ClInclude>
+    <ClInclude Include="libs\Light.hpp">
       <Filter>Pliki nagłówkowe</Filter>
     </ClInclude>
   </ItemGroup>

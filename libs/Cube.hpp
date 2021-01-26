@@ -5,8 +5,8 @@
 
 #include "Component.hpp"
 
-class Cube : Component {
-private:
+class Cube : public Component {
+protected:
 	unsigned int VBO;
 	unsigned int VAO;
 	unsigned int EBO;
