@@ -18,14 +18,12 @@
 #include "libs/GameState.hpp"
 #include "libs/RotatorContoller.hpp"
 #include "libs/Time.hpp"
-#include "libs/Light.hpp"
 
 void framebuffer_size_callback(GLFWwindow* window, int width, int height);
 void mouse_callback(GLFWwindow* window, double xpos, double ypos);
 void scroll_callback(GLFWwindow* window, double xoffset, double yoffset);
 void processInput(GLFWwindow* window);
 
-// settings
 const unsigned int SCR_WIDTH = 1920;
 const unsigned int SCR_HEIGHT = 1080;
 
@@ -37,6 +35,10 @@ Camera** cam;
 float lastX;
 float lastY;
 bool firstMouse = true;
+
+Cube* c;
+Shader* currentShader;
+Texture* tex;
 
 float deltaTime = 0.0f;
 float lastFrame = 0.0f;
@@ -66,6 +68,45 @@ void init() {
 	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 }
 
+Transform* createTransform(int x, int y, int z, bool wall, int wallMode) {
+	float height = wall ? 1.0f : 0.1f;
+	float heightShift = wall ? 0.0f : 0.45f;
+	float w1 = wall && wallMode == 0 || wallMode == 2 || wallMode == 4 || wallMode == 5 ? 0.1f : 1.0f;
+	float w2 = wall && wallMode == 1 || wallMode == 3 ? 0.1f : 1.0f;
+	float wShift1 = 0.0f;
+	float wShift2 = 0.0f;
+	float angl = 0.0f;
+	w2 = wallMode == 4 || wallMode == 5 ? 1.41f : w2;
+	if (wallMode == 0) {
+		wShift1 = -0.45f;
+	}
+	if (wallMode == 1) {
+		wShift2 = 0.45f;
+	}
+	if (wallMode == 2) {
+		wShift1 = -0.45f;
+	}
+	if (wallMode == 3) {
+		wShift2 = -0.45f;
+	}
+	if (wallMode == 4) {
+		angl = 0.85f;
+	}
+
+	if (wallMode == 5) {
+		angl = -1.2f;
+	}
+	return new Transform(vec3(1.0f * x + wShift1, 1.0f * y + heightShift, 1.0f * z + wShift2), vec3(w1, height, w2), vec3(0.0f, angl, 0.0f));
+}
+
+GameObject* createCube(int x, int y, int z, bool wall, int wallMode) {
+	GameObject* obj = new GameObject(c, currentShader);
+	obj->addComponent(tex);
+	obj->addComponent(createTransform(x, y, z, wall, wallMode));
+	//obj->addComponent(new RotatorController(glm::vec3(0.2f + i * 1.1, 0.2f + j * 1.1, 0.2f)));
+	return obj;
+}
+
 int main() {
 	init();
 	GLFWwindow* window = glfwCreateWindow(SCR_WIDTH, SCR_HEIGHT, "LearnOpenGL", NULL, NULL);
@@ -74,6 +115,7 @@ int main() {
 		exit(-1);
 	}
 	glfwMakeContextCurrent(window);
+	glfwSwapInterval(0);
 	if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress)) {
 		std::cout << "Failed to initialize GLAD" << std::endl;
 		exit(-1);
@@ -88,11 +130,13 @@ int main() {
 	stbi_set_flip_vertically_on_load(true);
 
 
-	// set the texture wrapping/filtering options (on currently bound texture)
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+
+	//glEnable(GL_CULL_FACE);
+	//glCullFace(GL_FRONT);
 
 	gs = GameState::get();
 	cam = gs->getCamera();
@@ -100,49 +144,34 @@ int main() {
 	float lastX = gs->SCR_WIDTH / 2.0f;
 	float lastY = gs->SCR_HEIGHT / 2.0f;
 
-	// Create Cube
-	Cube* c = new Cube();
+	c = new Cube();
 
-	// load and create a texture 
-	// -------------------------
-	Texture* tex = new Texture("brick.jpg", "grafiti.png");
+	tex = new Texture("container2.png");
+	currentShader = new Shader("cubeVs.glsl", "cubeFs.glsl");
 
-	// Shader Class
-	Shader* currentShader = new Shader("cubeVs.glsl", "cubeFs.glsl");
+	vector<GameObject*> objs;
 
-	vector<GameObject*> objts;
+	int sx = -10;
+	int sy = -10;
+	int ex = 10;
+	int ey = 10;
 
-	glm::vec3 cubePositions[] = {
-		glm::vec3(0.0f, 0.0f, 0.0f),
-		glm::vec3(2.0f, 5.0f, -15.0f),
-		glm::vec3(-1.5f, -2.2f, -2.5f),
-		glm::vec3(-3.8f, -2.0f, -12.3f),
-		glm::vec3(2.4f, -0.4f, -3.5f),
-		glm::vec3(-1.7f, 3.0f, -7.5f),
-		glm::vec3(1.3f, -2.0f, -2.5f),
-		glm::vec3(1.5f, 2.0f, -2.5f),
-		glm::vec3(1.5f, 0.2f, -1.5f),
-		glm::vec3(-1.3f, 1.0f, -1.5f)
-	};
+	for (int i = sx; i < ex; i++) {
+		for (int j = sy; j < ey; j++) {		
+			objs.push_back(createCube(i, 0, j, false, -1));
+		}
+	}	
 
-	Light* lightC = new Light();
+
+	objs.push_back(createCube(3, 1, 1, true, 4));
+	objs.push_back(createCube(2, 1, 1, true, 1));
+	objs.push_back(createCube(2, 1, 1, true, 3));
+	objs.push_back(createCube(3, 1, 1, true, 1));
+
 	Shader* lightShader = new Shader("cubeVs.glsl", "lightFs.glsl");
-	GameObject* light = new GameObject();
-	for (int i = 0; i < 10; i++) {
-		GameObject* obj = new GameObject();
-		obj->addComponent(c);
-		obj->addComponent(tex);
-		obj->addComponent(currentShader);
-		vec3 scaleV = vec3(1.0f, 1.0f, 1.0f) + vec3(-0.5f + (float)i * 0.1f);
-		obj->addComponent(new Transform(cubePositions[i], scaleV, vec3(0.0f, 0.0f, 0.0f)));
-		float x = (float)i / 2;
-		float y = (float)i;
-		obj->addComponent(new RotatorController(glm::vec3(0.2f + x, 0.2f + y, 0)));
-		objts.push_back(obj);
-	}
-	light->addComponent(c);
-	light->addComponent(lightShader);
-	light->addComponent(new Transform(vec3(1.2f, 1.0f, 2.0f), vec3(0.2f), vec3(0.0f)));
+	GameObject* light = new GameObject(c, lightShader);
+	Transform* lightTransform = new Transform(vec3(0.0f, 3.0f, 0.0f), vec3(0.2f), vec3(0.0f));
+	light->addComponent(lightTransform);
 
 	while (!glfwWindowShouldClose(window)) {
 
@@ -155,11 +184,12 @@ int main() {
 
 		glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
-		for (GameObject* obj : objts) {
+		for (GameObject* obj : objs) {
+			currentShader->setVec3("light.position", lightTransform->position);
 			obj->onUpdate();
 		}
-		lightShader->use();
+		//lightShader->use();
+		//lightTransform->position = lightTransform->position + vec3(0.0f, 0.01f, 0.0f);
 		light->onUpdate();
 		
 		glfwSwapBuffers(window);
@@ -180,7 +210,7 @@ void mouse_callback(GLFWwindow* window, double xpos, double ypos)
 	}
 
 	float xoffset = xpos - lastX;
-	float yoffset = lastY - ypos; // reversed since y-coordinates go from bottom to top
+	float yoffset = lastY - ypos;
 
 	lastX = xpos;
 	lastY = ypos;
@@ -188,8 +218,6 @@ void mouse_callback(GLFWwindow* window, double xpos, double ypos)
 	(*cam)->ProcessMouseMovement(xoffset, yoffset);
 }
 
-// glfw: whenever the mouse scroll wheel scrolls, this callback is called
-// ----------------------------------------------------------------------
 void scroll_callback(GLFWwindow* window, double xoffset, double yoffset)
 {
 	(*cam)->ProcessMouseScroll(yoffset);

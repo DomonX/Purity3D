@@ -182,13 +182,13 @@
     <ClInclude Include="libs\Cube.hpp" />
     <ClInclude Include="libs\GameObject.hpp" />
     <ClInclude Include="libs\GameState.hpp" />
-    <ClInclude Include="libs\Light.hpp" />
     <ClInclude Include="libs\RotatorContoller.hpp" />
     <ClInclude Include="libs\shader.hpp" />
     <ClInclude Include="libs\stb_image.h" />
     <ClInclude Include="libs\Texture.hpp" />
     <ClInclude Include="libs\Time.hpp" />
     <ClInclude Include="libs\Transform.hpp" />
+    <ClInclude Include="Model.hpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

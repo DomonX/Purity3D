@@ -4,12 +4,12 @@
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
 
-#include "Component.hpp";
+#include "GameObject.hpp";
 #include "shader.hpp";
 
 class Transform : public Component {
 private:
-	Shader* shader;
+	GameObject* go = nullptr;
 public:
 	glm::vec3 position;
 	glm::vec3 scale;
@@ -21,6 +21,7 @@ public:
 		this->rotation = rotation;
 	}
 
+	/*! \brief Lifecycle called when frame is updated */
 	void onUpdate() {
 		glm::mat4 model = glm::mat4(1.0f);
 		model = translate(model, position);
@@ -28,12 +29,12 @@ public:
 		model = glm::rotate(model, rotation.y, glm::vec3(0.0f, 1.0f, 0.0f));
 		model = glm::rotate(model, rotation.z, glm::vec3(0.0f, 0.0f, 1.0f));
 		model = glm::scale(model, scale);
-		int modelLoc = glGetUniformLocation(shader->getId(), "model");
+		int modelLoc = glGetUniformLocation(go->getShader()->getId(), "model");
 		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
 	}
 
-	void onGetOtherComponent(Component* component) {
-		storeIfIsInstance(&shader, component);
+	void getGameObject(Component* go) {
+		this->go = (GameObject*)go;
 	}
 
 };

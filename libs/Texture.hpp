@@ -4,37 +4,31 @@
 
 #include "Component.hpp"
 #include "shader.hpp"
+#include "GameObject.hpp"
 using namespace std;
 class Texture : public Component {
 private:
 	string path1;
 	string path2;
-	Shader* shader;
 	unsigned int texture1;
-	unsigned int texture2;
+	GameObject* go = nullptr;
 public:
-	Texture(string path1, string path2) {
+	Texture(string path1) {
 		this->path1 = path1;
-		this->path2 = path2;
 		texture1 = createTexture(path1.c_str());
-		texture2 = createTexture(path2.c_str());
-	}
-
-	void onGetOtherComponent(Component* component) {
-		storeIfIsInstance(&shader, component);
-		if (isInstance(&shader, component)) {
-			shader->use();
-			shader->setInt("texture1", 0);
-			shader->setInt("texture2", 1);
-		}
 	}
 
 	void onUpdate() {
 		glActiveTexture(GL_TEXTURE0);
 		glBindTexture(GL_TEXTURE_2D, texture1);
-		glActiveTexture(GL_TEXTURE1);
-		glBindTexture(GL_TEXTURE_2D, texture2);
 	}
+
+	void getGameObject(Component* go) {
+		this->go = (GameObject*)go;
+		this->go->getShader()->use();
+		this->go->getShader()->setInt("texture1", 0);
+	}
+
 private:
 	int createTexture(const char* path) {
 		unsigned int texture;

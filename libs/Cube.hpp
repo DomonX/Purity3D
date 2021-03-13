@@ -4,8 +4,9 @@
 #include <GLFW/glfw3.h>
 
 #include "Component.hpp"
+#include "Model.hpp"
 
-class Cube : public Component {
+class Cube : public Model {
 protected:
 	unsigned int VBO;
 	unsigned int VAO;
@@ -30,35 +31,36 @@ public:
 		glm::vec3 c8 = glm::vec3(-0.5f, 0.5f, 0.5f);
 
 		float cubeModel[] = {
-			c1.x, c1.y, c1.z, 0.0f, 0.0f,
-			c2.x, c2.y, c2.z, 1.0f, 0.0f,
-			c3.x, c3.y, c3.z, 1.0f, 1.0f,
-			c4.x, c4.y, c4.z, 0.0f, 1.0f,
+		//  COORDS			 // TEXTURE			// NORMALS
+			c1.x, c1.y, c1.z, 0.0f, 0.0f, 0.0f, 0.0f, -1.0f,
+			c2.x, c2.y, c2.z, 1.0f, 0.0f, 0.0f, 0.0f, -1.0f,
+			c3.x, c3.y, c3.z, 1.0f, 1.0f, 0.0f, 0.0f, -1.0f,
+			c4.x, c4.y, c4.z, 0.0f, 1.0f, 0.0f, 0.0f, -1.0f,
 
-			c5.x, c5.y, c5.z, 0.0f, 0.0f,
-			c6.x, c6.y, c6.z, 1.0f, 0.0f,
-			c7.x, c7.y, c7.z, 1.0f, 1.0f,
-			c8.x, c8.y, c8.z, 0.0f, 1.0f,
+			c5.x, c5.y, c5.z, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f,
+			c6.x, c6.y, c6.z, 1.0f, 0.0f, 0.0f, 0.0f, 1.0f,
+			c7.x, c7.y, c7.z, 1.0f, 1.0f, 0.0f, 0.0f, 1.0f,
+			c8.x, c8.y, c8.z, 0.0f, 1.0f, 0.0f, 0.0f, 1.0f,
 
-			c8.x, c8.y, c8.z, 1.0f, 0.0f,
-			c4.x, c4.y, c4.z, 1.0f, 1.0f,
-			c1.x, c1.y, c1.z, 0.0f, 1.0f,
-			c5.x, c5.y, c5.z, 0.0f, 0.0f,
+			c8.x, c8.y, c8.z, 1.0f, 0.0f, -1.0f, 0.0f, 0.0f,
+			c4.x, c4.y, c4.z, 1.0f, 1.0f, -1.0f, 0.0f, 0.0f,
+			c1.x, c1.y, c1.z, 0.0f, 1.0f, -1.0f, 0.0f, 0.0f,
+			c5.x, c5.y, c5.z, 0.0f, 0.0f, -1.0f, 0.0f, 0.0f,
 
-			c7.x, c7.y, c7.z, 1.0f, 0.0f,
-			c3.x, c3.y, c3.z, 1.0f, 1.0f,
-			c2.x, c2.y, c2.z, 0.0f, 1.0f,
-			c6.x, c6.y, c6.z, 0.0f, 0.0f,
+			c7.x, c7.y, c7.z, 1.0f, 0.0f, 1.0f, 0.0f, 0.0f,
+			c3.x, c3.y, c3.z, 1.0f, 1.0f, 1.0f, 0.0f, 0.0f,
+			c2.x, c2.y, c2.z, 0.0f, 1.0f, 1.0f, 0.0f, 0.0f,
+			c6.x, c6.y, c6.z, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f,
 
-			c1.x, c1.y, c1.z, 0.0f, 1.0f,
-			c2.x, c2.y, c2.z, 1.0f, 1.0f,
-			c6.x, c6.y, c6.z, 1.0f, 0.0f,
-			c5.x, c5.y, c5.z, 0.0f, 0.0f,
+			c1.x, c1.y, c1.z, 0.0f, 1.0f, 0.0f, -1.0f, 0.0f,
+			c2.x, c2.y, c2.z, 1.0f, 1.0f, 0.0f, -1.0f, 0.0f,
+			c6.x, c6.y, c6.z, 1.0f, 0.0f, 0.0f, -1.0f, 0.0f,
+			c5.x, c5.y, c5.z, 0.0f, 0.0f, 0.0f, -1.0f, 0.0f,
 
-			c4.x, c4.y, c4.z, 0.0f, 1.0f,
-			c3.x, c3.y, c3.z, 1.0f, 1.0f,
-			c7.x, c7.y, c7.z, 1.0f, 0.0f,
-			c8.x, c8.y, c8.z, 0.0f, 0.0f,
+			c4.x, c4.y, c4.z, 0.0f, 1.0f, 0.0f, 1.0f, 0.0f,
+			c3.x, c3.y, c3.z, 1.0f, 1.0f, 0.0f, 1.0f, 0.0f,
+			c7.x, c7.y, c7.z, 1.0f, 0.0f, 0.0f, 1.0f, 0.0f,
+			c8.x, c8.y, c8.z, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f,
 		};
 
 		modelSize = sizeof(cubeModel) / sizeof(float);
@@ -99,12 +101,15 @@ public:
 		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
 		glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
 
-		glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)0);
+		glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)0);
 		glEnableVertexAttribArray(0);
-		glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)(3 * sizeof(float)));
+		glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(3 * sizeof(float)));
 		glEnableVertexAttribArray(1);
-	}
+		glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(5 * sizeof(float)));
+		glEnableVertexAttribArray(2);
 
+	}
+	/*! \brief Lifecycle called when frame is beign drawn on screen */
 	void onDraw() {
 		glBindVertexArray(VAO);
 		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
