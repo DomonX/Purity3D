@@ -6,7 +6,6 @@ flat in vec3 Normal;
 in vec3 FragPos;
 
 uniform sampler2D texture1;
-uniform sampler2D texture2;
 uniform vec3 lightColor;
 uniform vec3 viewPos;
 
@@ -17,8 +16,7 @@ struct Material {
 }; 
 
 struct DirLight {
-    vec3 direction;
-  
+    vec3 direction;  
     vec3 ambient;
     vec3 diffuse;
     vec3 specular;

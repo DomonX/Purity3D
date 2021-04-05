@@ -173,31 +173,38 @@
   <ItemGroup>
     <None Include="cubeFs.glsl" />
     <None Include="lightFs.glsl" />
+    <None Include="lightningFragmentShader.glsl" />
+    <None Include="ocTreeFs.glsl" />
     <None Include="packages.config" />
     <None Include="cubeVs.glsl" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="libs\Camera.hpp" />
     <ClInclude Include="libs\Component.hpp" />
-    <ClInclude Include="libs\Cube.hpp" />
     <ClInclude Include="libs\GameObject.hpp" />
     <ClInclude Include="libs\GameState.hpp" />
+    <ClInclude Include="libs\Light.hpp" />
+    <ClInclude Include="libs\Model.hpp" />
+    <ClInclude Include="libs\ObjLoader.hpp" />
+    <ClInclude Include="libs\OcTreeNode.hpp" />
+    <ClInclude Include="libs\PointLight.hpp" />
     <ClInclude Include="libs\RotatorContoller.hpp" />
     <ClInclude Include="libs\shader.hpp" />
     <ClInclude Include="libs\stb_image.h" />
     <ClInclude Include="libs\Texture.hpp" />
     <ClInclude Include="libs\Time.hpp" />
     <ClInclude Include="libs\Transform.hpp" />
-    <ClInclude Include="Model.hpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
     <Import Project="..\packages\glm.0.9.9.800\build\native\glm.targets" Condition="Exists('..\packages\glm.0.9.9.800\build\native\glm.targets')" />
+    <Import Project="..\packages\boost.1.72.0.0\build\boost.targets" Condition="Exists('..\packages\boost.1.72.0.0\build\boost.targets')" />
   </ImportGroup>
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
     <PropertyGroup>
       <ErrorText>Ten projekt zawiera odwołania do pakietów NuGet, których nie ma na tym komputerze. Użyj przywracania pakietów NuGet, aby je pobrać. Aby uzyskać więcej informacji, zobacz http://go.microsoft.com/fwlink/?LinkID=322105. Brakujący plik: {0}.</ErrorText>
     </PropertyGroup>
     <Error Condition="!Exists('..\packages\glm.0.9.9.800\build\native\glm.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\glm.0.9.9.800\build\native\glm.targets'))" />
+    <Error Condition="!Exists('..\packages\boost.1.72.0.0\build\boost.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\boost.1.72.0.0\build\boost.targets'))" />
   </Target>
 </Project>

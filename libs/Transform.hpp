@@ -21,7 +21,6 @@ public:
 		this->rotation = rotation;
 	}
 
-	/*! \brief Lifecycle called when frame is updated */
 	void onUpdate() {
 		glm::mat4 model = glm::mat4(1.0f);
 		model = translate(model, position);

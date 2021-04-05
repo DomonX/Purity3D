@@ -10,7 +10,6 @@
 
 #include "libs/shader.hpp"
 #include "libs/stb_image.h"
-#include "libs/Cube.hpp"
 #include "libs/Camera.hpp"
 #include "libs/Texture.hpp"
 #include "libs/Transform.hpp"
@@ -18,6 +17,9 @@
 #include "libs/GameState.hpp"
 #include "libs/RotatorContoller.hpp"
 #include "libs/Time.hpp"
+#include "libs/PointLight.hpp"
+#include "libs/ObjLoader.hpp"
+#include "libs/OcTreeNode.hpp"
 
 void framebuffer_size_callback(GLFWwindow* window, int width, int height);
 void mouse_callback(GLFWwindow* window, double xpos, double ypos);
@@ -35,8 +37,8 @@ Camera** cam;
 float lastX;
 float lastY;
 bool firstMouse = true;
-
-Cube* c;
+Model* m;
+Model* w;
 Shader* currentShader;
 Texture* tex;
 
@@ -68,44 +70,17 @@ void init() {
 	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 }
 
-Transform* createTransform(int x, int y, int z, bool wall, int wallMode) {
-	float height = wall ? 1.0f : 0.1f;
-	float heightShift = wall ? 0.0f : 0.45f;
-	float w1 = wall && wallMode == 0 || wallMode == 2 || wallMode == 4 || wallMode == 5 ? 0.1f : 1.0f;
-	float w2 = wall && wallMode == 1 || wallMode == 3 ? 0.1f : 1.0f;
-	float wShift1 = 0.0f;
-	float wShift2 = 0.0f;
-	float angl = 0.0f;
-	w2 = wallMode == 4 || wallMode == 5 ? 1.41f : w2;
-	if (wallMode == 0) {
-		wShift1 = -0.45f;
-	}
-	if (wallMode == 1) {
-		wShift2 = 0.45f;
-	}
-	if (wallMode == 2) {
-		wShift1 = -0.45f;
-	}
-	if (wallMode == 3) {
-		wShift2 = -0.45f;
-	}
-	if (wallMode == 4) {
-		angl = 0.85f;
-	}
-
-	if (wallMode == 5) {
-		angl = -1.2f;
-	}
-	return new Transform(vec3(1.0f * x + wShift1, 1.0f * y + heightShift, 1.0f * z + wShift2), vec3(w1, height, w2), vec3(0.0f, angl, 0.0f));
+Transform* createTransform(int x, int y, int z) {
+	return new Transform(vec3(2.0f * x, 2.0f * y, 2.0f * z), vec3(1.0f, 1.0f, 1.0f), vec3(0.0f, 0.0f, 0.0f));
 }
 
-GameObject* createCube(int x, int y, int z, bool wall, int wallMode) {
-	GameObject* obj = new GameObject(c, currentShader);
+GameObject* createCube(int x, int y, int z) {
+	GameObject* obj = new GameObject(m, currentShader);
 	obj->addComponent(tex);
-	obj->addComponent(createTransform(x, y, z, wall, wallMode));
-	//obj->addComponent(new RotatorController(glm::vec3(0.2f + i * 1.1, 0.2f + j * 1.1, 0.2f)));
+	obj->addComponent(createTransform(x, y, z));
 	return obj;
 }
+
 
 int main() {
 	init();
@@ -125,18 +100,22 @@ int main() {
 	glfwSetScrollCallback(window, scroll_callback);
 	glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 	glViewport(0, 0, SCR_WIDTH, SCR_HEIGHT);
+
 	glEnable(GL_DEPTH_TEST);
+	glDepthFunc(GL_LESS);
+
+	glEnable(GL_BLEND);
+
+	//glEnable(GL_CULL_FACE);
+	//glCullFace(GL_BACK);
+	//glFrontFace(GL_CCW);
 
 	stbi_set_flip_vertically_on_load(true);
-
 
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-
-	//glEnable(GL_CULL_FACE);
-	//glCullFace(GL_FRONT);
 
 	gs = GameState::get();
 	cam = gs->getCamera();
@@ -144,12 +123,19 @@ int main() {
 	float lastX = gs->SCR_WIDTH / 2.0f;
 	float lastY = gs->SCR_HEIGHT / 2.0f;
 
-	c = new Cube();
+	m = new Model("assets/cube.obj");
+	w = new Model("assets/weird.obj");
 
-	tex = new Texture("container2.png");
-	currentShader = new Shader("cubeVs.glsl", "cubeFs.glsl");
+	tex = new Texture("assets/texture.png");
+	currentShader = new Shader("cubeVs.glsl", "lightningFragmentShader.glsl");
 
 	vector<GameObject*> objs;
+
+	vector<PointLight*> lights;
+
+	lights.push_back(new PointLight(vec3(0.0f, 3.0f, 0.0f)));
+	lights.push_back(new PointLight(vec3(2.0f, 3.0f, 1.0f)));
+	lights.push_back(new PointLight(vec3(6.0f, 4.0f, 5.0f)));
 
 	int sx = -10;
 	int sy = -10;
@@ -158,40 +144,41 @@ int main() {
 
 	for (int i = sx; i < ex; i++) {
 		for (int j = sy; j < ey; j++) {		
-			objs.push_back(createCube(i, 0, j, false, -1));
+			objs.push_back(createCube(i, 0, j));
 		}
 	}	
 
+	GameObject* obj = new GameObject(w, currentShader);
+	obj->addComponent(tex);
+	obj->addComponent(new Transform(vec3(2.0f, 2.0f, 12.0f), vec3(0.1f, 0.1f, 0.1f), vec3(0.0f, 0.0f, 0.0f)));
+	objs.push_back(obj);
 
-	objs.push_back(createCube(3, 1, 1, true, 4));
-	objs.push_back(createCube(2, 1, 1, true, 1));
-	objs.push_back(createCube(2, 1, 1, true, 3));
-	objs.push_back(createCube(3, 1, 1, true, 1));
+	objs.push_back(createCube(3, 1, 1));
 
-	Shader* lightShader = new Shader("cubeVs.glsl", "lightFs.glsl");
-	GameObject* light = new GameObject(c, lightShader);
-	Transform* lightTransform = new Transform(vec3(0.0f, 3.0f, 0.0f), vec3(0.2f), vec3(0.0f));
-	light->addComponent(lightTransform);
-
+	OcTreeNode* ocT = new OcTreeNode(glm::vec3(0.0f, 7.0f, 0.0f), glm::vec3(5.0f, 5.0f, 5.0f));
+	ocT->partify();
+	ocT->children[3]->partify();
+	ocT->children[3]->children[5]->partify();
 	while (!glfwWindowShouldClose(window)) {
-
 		float currentFrame = glfwGetTime();
 		deltaTime = currentFrame - lastFrame;
 		lastFrame = currentFrame;
 		Time::get()->setDeltaTime(deltaTime);
+		glClear(GL_DEPTH_BUFFER_BIT);
 
 		processInput(window);
 
 		glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+		currentShader->use();
+		currentShader->setInt("pointLightsCounter", lights.size());
+		for (int i = 0; i < lights.size(); i++) {
+			lights.at(i)->run(i, currentShader);
+		}
 		for (GameObject* obj : objs) {
-			currentShader->setVec3("light.position", lightTransform->position);
 			obj->onUpdate();
 		}
-		//lightShader->use();
-		//lightTransform->position = lightTransform->position + vec3(0.0f, 0.01f, 0.0f);
-		light->onUpdate();
-		
+		ocT->onUpdate();
 		glfwSwapBuffers(window);
 		glfwPollEvents();
 	}

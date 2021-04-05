@@ -12,14 +12,14 @@ private:
 public:
 	static const unsigned int SCR_WIDTH = 1920;
 	static const unsigned int SCR_HEIGHT = 1080;
-	/*! \brief Getting global game state object */
+
 	static GameState* get() {
 		if (instance) {
 			return instance;
 		}
 		instance = new GameState();
 	}
-	/*! \brief Getting global camera object */
+
 	Camera** getCamera() {
 		return &cam;
 	}

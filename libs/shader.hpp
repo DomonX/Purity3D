@@ -37,14 +37,13 @@ public:
 		use();
 		setVec3("material.diffuse", 1.0f, 0.5f, 0.31f);
 		setVec3("material.specular", 0.5f, 0.5f, 0.5f);
-		setFloat("material.shininess", 32.0f);
-		setFloat("material.abs", 0.1f);
-		setVec3("light.ambient", 0.2f, 0.2f, 0.2f);
-		setVec3("light.diffuse", 0.5f, 0.5f, 0.5f); // darken diffuse light a bit
-		setVec3("light.specular", 1.0f, 1.0f, 1.0f);
-		setFloat("light.stren", 6.2f);
-		setFloat("light.distStren", 1.0f);
+		setFloat("material.shininess", 8.0f);
+		setVec3("ambient.color", 0.5f, 0.5f, 1.0f);
+		setFloat("ambient.brightness", 1.0f);
+		setFloat("ambient.min", 0.0f);
+		setFloat("ambient.max", 0.1f);
 		setVec3("viewPos", cam->Position);
+
 		int viewLoc = glGetUniformLocation(getId(), "view");
 		glUniformMatrix4fv(viewLoc, 1, GL_FALSE, glm::value_ptr(view));
 
@@ -56,7 +55,6 @@ public:
 		);
 		int projectionLoc = glGetUniformLocation(getId(), "projection");
 		glUniformMatrix4fv(projectionLoc, 1, GL_FALSE, glm::value_ptr(projection));
-		setVec3("lightColor", 1.0f, 1.0f, 1.0f);
 	}
 private:
 	int compileShader(std::string path, int type);

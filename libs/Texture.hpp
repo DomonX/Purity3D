@@ -9,7 +9,6 @@ using namespace std;
 class Texture : public Component {
 private:
 	string path1;
-	string path2;
 	unsigned int texture1;
 	GameObject* go = nullptr;
 public:
