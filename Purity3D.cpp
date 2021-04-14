@@ -20,6 +20,8 @@
 #include "libs/PointLight.hpp"
 #include "libs/ObjLoader.hpp"
 #include "libs/OcTreeNode.hpp"
+#include "libs/RidgitBody.hpp"
+#include "libs/SphereCollider.hpp"
 
 void framebuffer_size_callback(GLFWwindow* window, int width, int height);
 void mouse_callback(GLFWwindow* window, double xpos, double ypos);
@@ -39,6 +41,7 @@ float lastY;
 bool firstMouse = true;
 Model* m;
 Model* w;
+Model* sphere;
 Shader* currentShader;
 Texture* tex;
 
@@ -79,6 +82,15 @@ GameObject* createCube(int x, int y, int z) {
 	obj->addComponent(tex);
 	obj->addComponent(createTransform(x, y, z));
 	return obj;
+}
+
+GameObject* createSphere(float x, float y, float z, float elasticity = 0.0f) {
+	GameObject* sphereO = new GameObject(sphere, currentShader);
+	sphereO->addComponent(tex);
+	sphereO->addComponent(new Transform(vec3(2.0f * x, 2.0f * y, 2.0f * z), vec3(1.0f, 1.0f, 1.0f), vec3(0.0f, 0.0f, 0.0f)));
+	sphereO->addComponent(new RidgitBody(elasticity));
+	sphereO->addComponent(new SphereCollider());
+	return sphereO;
 }
 
 
@@ -125,8 +137,9 @@ int main() {
 
 	m = new Model("assets/cube.obj");
 	w = new Model("assets/weird.obj");
+	sphere = new Model("assets/sphere.obj");
 
-	tex = new Texture("assets/texture.png");
+	tex = new Texture("brick.jpg");
 	currentShader = new Shader("cubeVs.glsl", "lightningFragmentShader.glsl");
 
 	vector<GameObject*> objs;
@@ -151,14 +164,32 @@ int main() {
 	GameObject* obj = new GameObject(w, currentShader);
 	obj->addComponent(tex);
 	obj->addComponent(new Transform(vec3(2.0f, 2.0f, 12.0f), vec3(0.1f, 0.1f, 0.1f), vec3(0.0f, 0.0f, 0.0f)));
-	objs.push_back(obj);
+	//objs.push_back(obj);
 
-	objs.push_back(createCube(3, 1, 1));
+	// objs.push_back(createCube(3, 1, 1));
+	GameObject* sphere = createSphere(-7, 1.2, 1, 0.0f);
+	RidgitBody* sBody = sphere->getComponent<RidgitBody>();
+	SphereCollider* col = sphere->getComponent<SphereCollider>();
+	sBody->addForce(vec3(2.51f, 0.0f, 0.0f));
+	objs.push_back(sphere);
 
-	OcTreeNode* ocT = new OcTreeNode(glm::vec3(0.0f, 7.0f, 0.0f), glm::vec3(5.0f, 5.0f, 5.0f));
+	GameObject* sphere2 = createSphere(5, 1, 1, 0.2f);
+	RidgitBody* sBody2 = sphere2->getComponent<RidgitBody>();
+	SphereCollider* col2 = sphere2->getComponent<SphereCollider>();
+	sBody2->addForce(vec3(-0.51f, 0.0f, 0.0f));
+	objs.push_back(sphere2);
+
+	GameObject* sphere3 = createSphere(4, 1.3, 4.3, 0.4f);
+	RidgitBody* sBody3 = sphere3->getComponent<RidgitBody>();
+	SphereCollider* col3 = sphere3->getComponent<SphereCollider>();
+	sBody3->addForce(vec3(0.0f, 0.0f, -0.85f));
+	objs.push_back(sphere3);
+
+	OcTreeNode* ocT = new OcTreeNode(glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(25.0f, 25.0f, 25.0f));
 	ocT->partify();
-	ocT->children[3]->partify();
-	ocT->children[3]->children[5]->partify();
+	ocT->children[OC_RIGHT & OC_UP & OC_FORWARD]->partify();
+	ocT->children[OC_RIGHT & OC_UP & OC_FORWARD]->children[OC_RIGHT & OC_UP & OC_DOWN]->partify();
+
 	while (!glfwWindowShouldClose(window)) {
 		float currentFrame = glfwGetTime();
 		deltaTime = currentFrame - lastFrame;
@@ -178,7 +209,10 @@ int main() {
 		for (GameObject* obj : objs) {
 			obj->onUpdate();
 		}
-		ocT->onUpdate();
+		col->getCollision(col2);
+		col->getCollision(col3);
+		col2->getCollision(col3);
+		// ocT->onUpdate();
 		glfwSwapBuffers(window);
 		glfwPollEvents();
 	}

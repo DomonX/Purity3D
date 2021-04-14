@@ -5,7 +5,6 @@
 #include <glm/gtc/matrix_transform.hpp>
 
 #include <vector>
-/*! \brief Enum containing directions of Camera movement*/
 enum Camera_Movement {
 	FORWARD,
 	BACKWARD,

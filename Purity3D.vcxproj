@@ -179,6 +179,8 @@
     <None Include="cubeVs.glsl" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="libs\RidgitBody.hpp" />
+    <ClInclude Include="libs\SphereCollider.hpp" />
     <ClInclude Include="libs\Camera.hpp" />
     <ClInclude Include="libs\Component.hpp" />
     <ClInclude Include="libs\GameObject.hpp" />

@@ -7,7 +7,7 @@ private:
 	static GameState* instance;
 	static Camera* cam;
 	GameState() {
-		cam = new Camera(glm::vec3(0.0f, 0.0f, 3.0f));
+		cam = new Camera(glm::vec3(0.0f, 8.0f, 0.0f));
 	}
 public:
 	static const unsigned int SCR_WIDTH = 1920;
