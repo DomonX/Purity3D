@@ -4,19 +4,18 @@
 #include "Component.hpp"
 #include "Model.hpp"
 #include "shader.hpp"
+#include "Material.hpp"
 
 using namespace std;
 
 class GameObject : public Component {
 private:
 	Model* model;
-	Shader* shader;
 	vector<Component*> components;
 	vector<GameObject*> children;
 public:
-	GameObject(Model* model, Shader* shader) {
+	GameObject(Model* model) {
 		this->model = model;
-		this->shader = shader;
 	}
 
 	void addComponent(Component* component) {
@@ -39,7 +38,7 @@ public:
 	}
 
 	void onUpdate() {
-		shader->onUpdate();
+		model->onUpdate();
 		for (Component* i : components) {
 			i->onUpdate();
 		}
@@ -71,8 +70,16 @@ public:
 		return temp;
 	}
 
-	Shader * getShader() {
-		return shader;
+	Model* getModel() {
+		return model;
+	}
+
+	Shader* getShader() {
+		return getMaterial()->getShader();
+	}
+
+	Material* getMaterial() {
+		return getModel()->getMaterial();
 	}
 
 };

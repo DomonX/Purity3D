@@ -172,13 +172,15 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
-    <None Include="shaders\cubeFs.glsl" />
-    <None Include="shaders\cubeVs.glsl" />
-    <None Include="shaders\lightFs.glsl" />
-    <None Include="shaders\lightningFragmentShader.glsl" />
-    <None Include="shaders\ocTreeFs.glsl" />
+    <None Include="shaders\cube.vs" />
+    <None Include="shaders\light.fs" />
+    <None Include="shaders\cube.fs" />
+    <None Include="shaders\ocTree.fs" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="libs\DrawQueue.h" />
+    <ClInclude Include="libs\Engine.hpp" />
+    <ClInclude Include="libs\Material.hpp" />
     <ClInclude Include="libs\RidgitBody.hpp" />
     <ClInclude Include="libs\SphereCollider.hpp" />
     <ClInclude Include="libs\Camera.hpp" />

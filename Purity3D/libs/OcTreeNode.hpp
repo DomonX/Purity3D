@@ -27,8 +27,6 @@ public:
 	bool hasBeenPartified = false;
 	bool isVisible = true;
 
-	Shader* shader = new Shader("shaders/cubeVs.glsl", "shaders/ocTreeFs.glsl");
-	
 	glm::vec3 size;
 	glm::vec3 position;
 
@@ -39,7 +37,7 @@ public:
 public:
 	OcTreeNode(glm::vec3 position, glm::vec3 size) {
 		if (model == nullptr) {
-			model = new Model("assets/ocTreeCube.obj");
+			model = createModel();
 		}
 		model->setDrawMode(GL_LINES);
 		this->position = position;
@@ -49,7 +47,7 @@ public:
 
 	OcTreeNode(OcTreeNode* parent, glm::vec3 position, glm::vec3 size) {
 		if (model == nullptr) {
-			model = new Model("assets/ocTreeCube.obj");
+			model = createModel();
 		}
 		model->setDrawMode(GL_LINES);
 		this->position = position;
@@ -81,7 +79,7 @@ public:
 
 	void onUpdate() {
 		if (isVisible) {
-			shader->onUpdate();
+			model->onUpdate();
 			draw();
 			model->onDraw();
 		}
@@ -90,6 +88,16 @@ public:
 				node->onUpdate();
 			}
 		}
+	}
+
+	static Model* createModel() {
+		Shader* shader = new Shader("shaders/cube.vs", "shaders/ocTree.fs");
+		Material* material = new Material(shader);
+		return new Model("assets/ocTreeCube.obj", material);
+	}
+
+	Shader* getShader() {
+		return model->getMaterial()->getShader();
 	}
 
 public: // To be Private
@@ -140,21 +148,21 @@ public: // To be Private
 		glm::mat4 model = glm::mat4(1.0f);
 		model = translate(model, position);
 		model = glm::scale(model, size);
-		int modelLoc = glGetUniformLocation(shader->getId(), "model");
+		int modelLoc = glGetUniformLocation(getShader()->getId(), "model");
 		if (depth == 0) {
-			shader->setVec3("Color", vec3(0.0f, 0.0f, 1.0f));
+			getShader()->setVec3("Color", vec3(0.0f, 0.0f, 1.0f));
 		}
 		if (depth == 1) {
-			shader->setVec3("Color", vec3(1.0f, 0.0f, 0.0f));
+			getShader()->setVec3("Color", vec3(1.0f, 0.0f, 0.0f));
 		}
 		if (depth == 2) {
-			shader->setVec3("Color", vec3(0.0f, 1.0f, 1.0f));
+			getShader()->setVec3("Color", vec3(0.0f, 1.0f, 1.0f));
 		}
 		if (depth == 3) {
-			shader->setVec3("Color", vec3(1.0f, 1.0f, 0.0f));
+			getShader()->setVec3("Color", vec3(1.0f, 1.0f, 0.0f));
 		}
 		if (depth > 3) {
-			shader->setVec3("Color", vec3(1.0f, 1.0f, 1.0f));
+			getShader()->setVec3("Color", vec3(1.0f, 1.0f, 1.0f));
 		}
 		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
 	}

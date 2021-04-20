@@ -39,10 +39,10 @@ Camera** cam;
 float lastX;
 float lastY;
 bool firstMouse = true;
-Model* m;
-Model* w;
+Model* cube;
 Model* sphere;
 Shader* currentShader;
+Material* material;
 Texture* tex;
 
 float deltaTime = 0.0f;
@@ -55,7 +55,6 @@ void framebuffer_size_callback(GLFWwindow* window, int width, int height) {
 void processInput(GLFWwindow* window) {
 	if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
 		glfwSetWindowShouldClose(window, true);
-
 	if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
 		(*cam)->ProcessKeyboard(FORWARD, deltaTime);
 	if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
@@ -78,14 +77,14 @@ Transform* createTransform(int x, int y, int z) {
 }
 
 GameObject* createCube(int x, int y, int z) {
-	GameObject* obj = new GameObject(m, currentShader);
+	GameObject* obj = new GameObject(cube);
 	obj->addComponent(tex);
 	obj->addComponent(createTransform(x, y, z));
 	return obj;
 }
 
 GameObject* createSphere(float x, float y, float z, float elasticity = 0.0f) {
-	GameObject* sphereO = new GameObject(sphere, currentShader);
+	GameObject* sphereO = new GameObject(sphere);
 	sphereO->addComponent(tex);
 	sphereO->addComponent(new Transform(vec3(2.0f * x, 2.0f * y, 2.0f * z), vec3(1.0f, 1.0f, 1.0f), vec3(0.0f, 0.0f, 0.0f)));
 	sphereO->addComponent(new RidgitBody(elasticity));
@@ -132,15 +131,13 @@ int main() {
 	gs = GameState::get();
 	cam = gs->getCamera();
 
-	float lastX = gs->SCR_WIDTH / 2.0f;
-	float lastY = gs->SCR_HEIGHT / 2.0f;
+	currentShader = new Shader("shaders/cube.vs", "shaders/cube.fs");
+	material = new Material(currentShader);
 
-	m = new Model("assets/cube.obj");
-	w = new Model("assets/weird.obj");
-	sphere = new Model("assets/sphere.obj");
+	cube = new Model("assets/cube.obj", material);
+	sphere = new Model("assets/sphere.obj", material);
 
 	tex = new Texture("assets/brick.jpg");
-	currentShader = new Shader("shaders/cubeVs.glsl", "shaders/lightningFragmentShader.glsl");
 
 	vector<GameObject*> objs;
 
@@ -161,16 +158,10 @@ int main() {
 		}
 	}	
 
-	GameObject* obj = new GameObject(w, currentShader);
-	obj->addComponent(tex);
-	obj->addComponent(new Transform(vec3(2.0f, 2.0f, 12.0f), vec3(0.1f, 0.1f, 0.1f), vec3(0.0f, 0.0f, 0.0f)));
-	//objs.push_back(obj);
-
-	// objs.push_back(createCube(3, 1, 1));
 	GameObject* sphere = createSphere(-7, 1.2, 1, 0.0f);
 	RidgitBody* sBody = sphere->getComponent<RidgitBody>();
 	SphereCollider* col = sphere->getComponent<SphereCollider>();
-	sBody->addForce(vec3(3.51f, 0.0f, 0.0f));
+	sBody->addForce(vec3(5.51f, 0.0f, 0.0f));
 	objs.push_back(sphere);
 
 	GameObject* sphere2 = createSphere(5, 1, 1, 0.2f);
@@ -185,7 +176,7 @@ int main() {
 	sBody3->addForce(vec3(0.0f, 0.0f, -0.90f));
 	objs.push_back(sphere3);
 
-	OcTreeNode* ocT = new OcTreeNode(glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(25.0f, 25.0f, 25.0f));
+	OcTreeNode* ocT = new OcTreeNode(glm::vec3(0.0f, 2.5f, 0.0f), glm::vec3(5.0f, 5.0f, 5.0f));
 	ocT->partify();
 	ocT->children[OC_RIGHT & OC_UP & OC_FORWARD]->partify();
 	ocT->children[OC_RIGHT & OC_UP & OC_FORWARD]->children[OC_RIGHT & OC_UP & OC_DOWN]->partify();
@@ -212,7 +203,7 @@ int main() {
 		col->getCollision(col2);
 		col->getCollision(col3);
 		col2->getCollision(col3);
-		// ocT->onUpdate();
+		ocT->onUpdate();
 		glfwSwapBuffers(window);
 		glfwPollEvents();
 	}
@@ -223,13 +214,6 @@ int main() {
 
 void mouse_callback(GLFWwindow* window, double xpos, double ypos)
 {
-	if (firstMouse)
-	{
-		lastX = xpos;
-		lastY = ypos;
-		firstMouse = false;
-	}
-
 	float xoffset = xpos - lastX;
 	float yoffset = lastY - ypos;
 

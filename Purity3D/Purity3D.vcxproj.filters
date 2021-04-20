@@ -36,19 +36,16 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
-    <None Include="shaders\cubeFs.glsl">
+    <None Include="shaders\cube.vs">
       <Filter>Pliki zasobów</Filter>
     </None>
-    <None Include="shaders\cubeVs.glsl">
+    <None Include="shaders\light.fs">
       <Filter>Pliki zasobów</Filter>
     </None>
-    <None Include="shaders\lightFs.glsl">
+    <None Include="shaders\cube.fs">
       <Filter>Pliki zasobów</Filter>
     </None>
-    <None Include="shaders\lightningFragmentShader.glsl">
-      <Filter>Pliki zasobów</Filter>
-    </None>
-    <None Include="shaders\ocTreeFs.glsl">
+    <None Include="shaders\ocTree.fs">
       <Filter>Pliki zasobów</Filter>
     </None>
   </ItemGroup>
@@ -102,6 +99,15 @@
       <Filter>Pliki nagłówkowe</Filter>
     </ClInclude>
     <ClInclude Include="libs\RidgitBody.hpp">
+      <Filter>Pliki nagłówkowe</Filter>
+    </ClInclude>
+    <ClInclude Include="libs\Material.hpp">
+      <Filter>Pliki nagłówkowe</Filter>
+    </ClInclude>
+    <ClInclude Include="libs\Engine.hpp">
+      <Filter>Pliki nagłówkowe</Filter>
+    </ClInclude>
+    <ClInclude Include="libs\DrawQueue.h">
       <Filter>Pliki nagłówkowe</Filter>
     </ClInclude>
   </ItemGroup>

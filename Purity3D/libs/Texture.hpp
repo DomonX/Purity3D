@@ -24,8 +24,8 @@ public:
 
 	void getGameObject(Component* go) {
 		this->go = (GameObject*)go;
-		this->go->getShader()->use();
-		this->go->getShader()->setInt("texture1", 0);
+		this->go->getMaterial()->getShader()->use();
+		this->go->getMaterial()->getShader()->setInt("texture1", 0);
 	}
 
 private:

@@ -29,7 +29,7 @@ public:
 		model = glm::rotate(model, rotation.y, glm::vec3(0.0f, 1.0f, 0.0f));
 		model = glm::rotate(model, rotation.z, glm::vec3(0.0f, 0.0f, 1.0f));
 		model = glm::scale(model, scale);
-		int modelLoc = glGetUniformLocation(go->getShader()->getId(), "model");
+		int modelLoc = glGetUniformLocation(go->getMaterial()->getShader()->getId(), "model");
 		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
 	}
 

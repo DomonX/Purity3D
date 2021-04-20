@@ -29,33 +29,10 @@ public:
 	void setVec3(const std::string& name, float x, float y, float z) const {
 		glUniform3f(glGetUniformLocation(id, name.c_str()), x, y, z);
 	}
-	int getId();
-	void onUpdate() {
-		GameState* gs = GameState::get();
-		Camera* cam = (*gs->getCamera());
-		glm::mat4 view = (*GameState::get()->getCamera())->GetViewMatrix();
-		use();
-		setVec3("material.diffuse", 1.0f, 0.5f, 0.31f);
-		setVec3("material.specular", 0.5f, 0.5f, 0.5f);
-		setFloat("material.shininess", 8.0f);
-		setVec3("ambient.color", 0.5f, 0.5f, 1.0f);
-		setFloat("ambient.brightness", 1.0f);
-		setFloat("ambient.min", 0.0f);
-		setFloat("ambient.max", 0.1f);
-		setVec3("viewPos", cam->Position);
-
-		int viewLoc = glGetUniformLocation(getId(), "view");
-		glUniformMatrix4fv(viewLoc, 1, GL_FALSE, glm::value_ptr(view));
-
-		glm::mat4 projection = glm::perspective(
-			glm::radians(cam->Zoom), 
-			(float)gs->SCR_WIDTH / (float)gs->SCR_HEIGHT, 
-			0.1f, 
-			100.0f
-		);
-		int projectionLoc = glGetUniformLocation(getId(), "projection");
-		glUniformMatrix4fv(projectionLoc, 1, GL_FALSE, glm::value_ptr(projection));
+	void setMat4(const std::string& name, glm::mat4 mat) const {
+		glUniformMatrix4fv(glGetUniformLocation(id, name.c_str()), 1, GL_FALSE, glm::value_ptr(mat));
 	}
+	int getId();
 private:
 	int compileShader(std::string path, int type);
 };
