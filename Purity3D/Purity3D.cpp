@@ -139,8 +139,8 @@ int main() {
 	w = new Model("assets/weird.obj");
 	sphere = new Model("assets/sphere.obj");
 
-	tex = new Texture("brick.jpg");
-	currentShader = new Shader("cubeVs.glsl", "lightningFragmentShader.glsl");
+	tex = new Texture("assets/brick.jpg");
+	currentShader = new Shader("shaders/cubeVs.glsl", "shaders/lightningFragmentShader.glsl");
 
 	vector<GameObject*> objs;
 
