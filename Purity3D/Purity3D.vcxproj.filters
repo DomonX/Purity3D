@@ -48,6 +48,9 @@
     <None Include="shaders\ocTree.fs">
       <Filter>Pliki zasobów</Filter>
     </None>
+    <None Include="shaders\stretch.vs">
+      <Filter>Pliki zasobów</Filter>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="libs\shader.hpp">

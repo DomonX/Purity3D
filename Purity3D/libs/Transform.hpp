@@ -44,6 +44,10 @@ public:
 		return parent->getPosition() + position;
 	}
 
+	void setPosition(vec3 position) {
+		this->position = position;
+	}
+
 	void setParent(Transform* parent) {
 		this->parent = parent;
 	}

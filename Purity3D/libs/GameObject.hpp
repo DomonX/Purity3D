@@ -81,5 +81,9 @@ public:
 	Material* getMaterial() {
 		return getModel()->getMaterial();
 	}
+protected:
+	void draw() {
+
+	}
 
 };

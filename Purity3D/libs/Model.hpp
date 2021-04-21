@@ -66,6 +66,10 @@ public:
 	Material* getMaterial() {
 		return material;
 	}
+
+	unsigned int getId() {
+		return modelId;
+	}
 };
 
 unsigned int Model::modelCounter = 0;

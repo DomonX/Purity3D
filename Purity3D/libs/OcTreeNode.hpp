@@ -20,6 +20,8 @@
 
 Model* model = nullptr;
 
+enum AxisPlacement { Outside, Inside, Partialy };
+
 class OcTreeNode {
 public:
 	OcTreeNode* parent;
@@ -122,6 +124,10 @@ public: // To be Private
 		}
 	}
 
+	AxisPlacement getXAxis(Transform* tr) {
+		// if(tr->getPosition())
+	}
+
 	bool isInside(vec3 point) {
 
 		if (!inRange(point.x, position.x - size.x / 2, position.x + size.x / 2)) {
@@ -149,20 +155,10 @@ public: // To be Private
 		model = translate(model, position);
 		model = glm::scale(model, size);
 		int modelLoc = glGetUniformLocation(getShader()->getId(), "model");
-		if (depth == 0) {
+		if (gameObjects.size() > 0) {
 			getShader()->setVec3("Color", vec3(0.0f, 0.0f, 1.0f));
-		}
-		if (depth == 1) {
+		} else {
 			getShader()->setVec3("Color", vec3(1.0f, 0.0f, 0.0f));
-		}
-		if (depth == 2) {
-			getShader()->setVec3("Color", vec3(0.0f, 1.0f, 1.0f));
-		}
-		if (depth == 3) {
-			getShader()->setVec3("Color", vec3(1.0f, 1.0f, 0.0f));
-		}
-		if (depth > 3) {
-			getShader()->setVec3("Color", vec3(1.0f, 1.0f, 1.0f));
 		}
 		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
 	}

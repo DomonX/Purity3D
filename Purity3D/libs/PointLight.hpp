@@ -7,10 +7,7 @@ using namespace glm;
 class PointLight : public Light {
 
 public:
-
-	PointLight(vec3 position) : Light(position) {
-
-	}
+	PointLight(vec3 position) : Light(position) { }
 	vec3 diffuse = vec3(0.5f, 0.5f, 0.5f);
 	vec3 specular = vec3(1.0f, 1.0f, 1.0f);
 	vec3 color = vec3(1.0f, 1.0f, 1.0f);
@@ -29,5 +26,9 @@ public:
 		shader->setFloat(variableName + ".linear", linear);
 		shader->setFloat(variableName + ".quadratic", quadric);
 		shader->setFloat(variableName + ".brightness", brightness);
+	}
+
+	void setColor(vec3 color) {
+		this->color = color;
 	}
 };

@@ -131,7 +131,7 @@ int main() {
 	gs = GameState::get();
 	cam = gs->getCamera();
 
-	currentShader = new Shader("shaders/cube.vs", "shaders/cube.fs");
+	currentShader = new Shader("shaders/stretch.vs", "shaders/cube.fs");
 	material = new Material(currentShader);
 
 	cube = new Model("assets/cube.obj", material);
@@ -143,9 +143,11 @@ int main() {
 
 	vector<PointLight*> lights;
 
-	lights.push_back(new PointLight(vec3(0.0f, 3.0f, 0.0f)));
-	lights.push_back(new PointLight(vec3(2.0f, 3.0f, 1.0f)));
-	lights.push_back(new PointLight(vec3(6.0f, 4.0f, 5.0f)));
+	PointLight* light = new PointLight(vec3(6.0f, 10.0f, 6.0f));
+
+	lights.push_back(light);
+	//lights.push_back(new PointLight(vec3(2.0f, 3.0f, 1.0f)));
+	//lights.push_back(new PointLight(vec3(6.0f, 4.0f, 5.0f)));
 
 	int sx = -10;
 	int sy = -10;
@@ -154,32 +156,36 @@ int main() {
 
 	for (int i = sx; i < ex; i++) {
 		for (int j = sy; j < ey; j++) {		
-			objs.push_back(createCube(i, 0, j));
+			// objs.push_back(createCube(i, 0, j));
 		}
 	}	
+
+	GameObject* cube = createCube(0, 0, 0);
+
+	objs.push_back(cube);
 
 	GameObject* sphere = createSphere(-7, 1.2, 1, 0.0f);
 	RidgitBody* sBody = sphere->getComponent<RidgitBody>();
 	SphereCollider* col = sphere->getComponent<SphereCollider>();
 	sBody->addForce(vec3(5.51f, 0.0f, 0.0f));
-	objs.push_back(sphere);
+	//objs.push_back(sphere);
 
 	GameObject* sphere2 = createSphere(5, 1, 1, 0.2f);
 	RidgitBody* sBody2 = sphere2->getComponent<RidgitBody>();
 	SphereCollider* col2 = sphere2->getComponent<SphereCollider>();
 	sBody2->addForce(vec3(-0.51f, 0.0f, 0.0f));
-	objs.push_back(sphere2);
+	//objs.push_back(sphere2);
 
 	GameObject* sphere3 = createSphere(4, 1.3, 4.3, 0.4f);
 	RidgitBody* sBody3 = sphere3->getComponent<RidgitBody>();
 	SphereCollider* col3 = sphere3->getComponent<SphereCollider>();
 	sBody3->addForce(vec3(0.0f, 0.0f, -0.90f));
-	objs.push_back(sphere3);
+	//objs.push_back(sphere3);
 
-	OcTreeNode* ocT = new OcTreeNode(glm::vec3(0.0f, 2.5f, 0.0f), glm::vec3(5.0f, 5.0f, 5.0f));
-	ocT->partify();
-	ocT->children[OC_RIGHT & OC_UP & OC_FORWARD]->partify();
-	ocT->children[OC_RIGHT & OC_UP & OC_FORWARD]->children[OC_RIGHT & OC_UP & OC_DOWN]->partify();
+	OcTreeNode* ocT = new OcTreeNode(glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(1.5f, 1.5f, 1.5f));
+	//ocT->partify();
+	//ocT->children[OC_RIGHT & OC_UP & OC_FORWARD]->partify();
+	//ocT->children[OC_RIGHT & OC_UP & OC_FORWARD]->children[OC_RIGHT & OC_UP & OC_DOWN]->partify();
 
 	while (!glfwWindowShouldClose(window)) {
 		float currentFrame = glfwGetTime();
@@ -194,6 +200,9 @@ int main() {
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 		currentShader->use();
 		currentShader->setInt("pointLightsCounter", lights.size());
+		float val = (sin(glfwGetTime()) + 1) / 2;
+		light->setColor(vec3(0.0f, 1 - val, val));
+		light->brightness = 2.0f + 3 * val;
 		for (int i = 0; i < lights.size(); i++) {
 			lights.at(i)->run(i, currentShader);
 		}

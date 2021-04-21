@@ -176,6 +176,7 @@
     <None Include="shaders\light.fs" />
     <None Include="shaders\cube.fs" />
     <None Include="shaders\ocTree.fs" />
+    <None Include="shaders\stretch.vs" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="libs\DrawQueue.h" />

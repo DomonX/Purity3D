@@ -10,12 +10,12 @@ class RidgitBody : public Component {
 
 	glm::vec3 velocity = glm::vec3(0.0f);
 	Transform* transform = nullptr;
-	float elasticity = 0.0f;
+	float elasticity;
 
 public:
 
 	RidgitBody() {
-
+		this->elasticity = 0.0f;
 	}
 
 	RidgitBody(float elasticity) {
