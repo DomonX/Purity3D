@@ -28,6 +28,10 @@ public:
 		this->go->getMaterial()->getShader()->setInt("texture1", 0);
 	}
 
+	bool isStatic() {
+		return true;
+	}
+
 private:
 	int createTexture(const char* path) {
 		unsigned int texture;

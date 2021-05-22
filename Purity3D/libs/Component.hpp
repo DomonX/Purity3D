@@ -20,6 +20,8 @@ public:
 	virtual void onDraw() {}
 	/*! \brief Lifecycle called when object is removed */
 	virtual void onDelete() {}
+
+	virtual bool isStatic() { return false; }
 protected:
 	/*! \brief Saves component if is instance of target to target */
 	template<class T> void storeIfIsInstance(T** target, Component* component) {

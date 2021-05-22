@@ -5,6 +5,7 @@
 #include "Model.hpp"
 #include "shader.hpp"
 #include "Material.hpp"
+#include "MotionListener.hpp"
 
 using namespace std;
 
@@ -13,6 +14,7 @@ private:
 	Model* model;
 	vector<Component*> components;
 	vector<GameObject*> children;
+	MotionListener* listener;
 public:
 	GameObject(Model* model) {
 		this->model = model;
@@ -54,7 +56,9 @@ public:
 			i->onDelete();
 		}
 		for (Component* i : components) {
-			delete(i);
+			if (!i->isStatic()) {
+				delete(i);
+			}
 		}
 		components.clear();
 	}
@@ -81,9 +85,16 @@ public:
 	Material* getMaterial() {
 		return getModel()->getMaterial();
 	}
-protected:
-	void draw() {
 
+	void setListener(MotionListener* listener) {
+		this->listener = listener;
+	}
+
+	void objectMoved(vec3 pos) {
+		if (!listener) {
+			return;
+		}
+		listener->objectMoved(this, pos);
 	}
 
 };

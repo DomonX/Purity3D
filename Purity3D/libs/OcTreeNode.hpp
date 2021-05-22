@@ -6,6 +6,7 @@
 #include "Light.hpp"
 #include "Transform.hpp"
 #include "Shader.hpp"
+#include "MotionListener.hpp"
 
 #define OC_RIGHT 0
 #define OC_UP 0
@@ -14,15 +15,9 @@
 #define OC_DOWN 2
 #define OC_BACKWARD 4
 
-#define MAX_OBJ 32
-
-#define MAX_LIGHTS 8
-
 Model* model = nullptr;
 
-enum AxisPlacement { Outside, Inside, Partialy };
-
-class OcTreeNode {
+class OcTreeNode : public MotionListener {
 public:
 	OcTreeNode* parent;
 	OcTreeNode* children[8];
@@ -33,15 +28,14 @@ public:
 	glm::vec3 position;
 
 	vector<GameObject*> gameObjects;
-	vector<Light*> lights;
 
 	int depth = 0;
 public:
 	OcTreeNode(glm::vec3 position, glm::vec3 size) {
 		if (model == nullptr) {
 			model = createModel();
+			model->setDrawMode(GL_LINES);
 		}
-		model->setDrawMode(GL_LINES);
 		this->position = position;
 		this->size = size;
 		parent = nullptr;
@@ -50,32 +44,27 @@ public:
 	OcTreeNode(OcTreeNode* parent, glm::vec3 position, glm::vec3 size) {
 		if (model == nullptr) {
 			model = createModel();
+			model->setDrawMode(GL_LINES);
 		}
-		model->setDrawMode(GL_LINES);
 		this->position = position;
 		this->size = size;
 		this->parent = parent;
 		this->depth = parent->depth + 1;
-		getElementsFromParent();
-	}
-
-	void addLight(Light* light) {
-		lights.push_back(light);
-		if (hasBeenPartified) {
-			return;
-		}
-		if (lights.size() > MAX_LIGHTS) {
-			partify();
-		}
 	}
 
 	void addObject(GameObject* object) {
-		gameObjects.push_back(object);
-		if (hasBeenPartified) {
+		vec3 pos = getPositionOfGameObject(object);
+		if (!isInside(pos)) {
 			return;
 		}
-		if (gameObjects.size() > MAX_OBJ) {
-			partify();
+		if (!hasBeenPartified) {
+			object->setListener(this);
+			gameObjects.push_back(object);
+			return;
+		}
+		OcTreeNode* node = getProperChildren(pos);
+		if (node) {
+			node->addObject(object);
 		}
 	}
 
@@ -90,6 +79,11 @@ public:
 				node->onUpdate();
 			}
 		}
+		if (!hasBeenPartified) {
+			for (GameObject* go : gameObjects) {
+				go->onUpdate();
+			}
+		}
 	}
 
 	static Model* createModel() {
@@ -102,48 +96,37 @@ public:
 		return model->getMaterial()->getShader();
 	}
 
-public: // To be Private
-
-	void wrap() {
-
-	}
-
+public:
 	void partify() {
 		for (int i = 0; i < 8; i++) {
 			children[i] = new OcTreeNode(this, position + getShift(i), size * vec3(0.5f));
 		}
+		for (GameObject* go : gameObjects) {
+			getProperChildren(getPositionOfGameObject(go))->addObject(go);
+		}
+		gameObjects.clear();
+		hasBeenPartified = true;
 	}
 
-	void getElementsFromParent() {
-		for (GameObject* go : parent->gameObjects) {
-			addGameObjectIfInside(go);
+	vec3 getPositionOfGameObject(GameObject* go) {
+		Transform* tr = go->getComponent<Transform>();
+		if (!tr) {
+			return vec3(0.0f, 0.0f, 0.0f);
 		}
-
-		for (Light* l : parent->lights) {
-			addLightIfInside(l);
-		}
-	}
-
-	AxisPlacement getXAxis(Transform* tr) {
-		// if(tr->getPosition())
+		return tr->getPosition();
 	}
 
 	bool isInside(vec3 point) {
-
-		if (!inRange(point.x, position.x - size.x / 2, position.x + size.x / 2)) {
+		if (!inRange(point.x, position.x - size.x, position.x + size.x)) {
 			return false;
 		}
-
-		if (!inRange(point.y, position.y - size.y / 2, position.y + size.y / 2)) {
+		if (!inRange(point.y, position.y - size.y, position.y + size.y)) {
 			return false;
 		}
-
-		if (!inRange(point.z, position.z - size.z / 2, position.z + size.z / 2)) {
+		if (!inRange(point.z, position.z - size.z, position.z + size.z)) {
 			return false;
 		}
-
 		return true;
-
 	}
 
 	bool inRange(float pos, float min, float max) {
@@ -151,62 +134,73 @@ public: // To be Private
 	}
 
 	void draw() {
+		if (hasBeenPartified) {
+			return;
+		}
 		glm::mat4 model = glm::mat4(1.0f);
 		model = translate(model, position);
 		model = glm::scale(model, size);
-		int modelLoc = glGetUniformLocation(getShader()->getId(), "model");
 		if (gameObjects.size() > 0) {
 			getShader()->setVec3("Color", vec3(0.0f, 0.0f, 1.0f));
 		} else {
 			getShader()->setVec3("Color", vec3(1.0f, 0.0f, 0.0f));
 		}
-		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
-	}
-
-	void addGameObjectIfInside(GameObject* go) {
-		Transform* tr = go->getComponent<Transform>();
-		if (!tr) {
-			return;
-		}
-		if (isInside(tr->position)) {
-			addObject(go);
-		}
-	}
-
-	void addLightIfInside(Light* l) {
-		if (isInside(l->getPosition())) {
-			addLight(l);
-		}
+		getShader()->setMat4("model", model);
 	}
 
 	vec3 getShift(unsigned int childPos) {
 		vec3 shift = vec3(0.0f);
 		if (childPos & OC_LEFT) {
 			shift -= vec3(size.x / 2, 0.0f, 0.0f);
-		}
-		else {
+		} else {
 			shift += vec3(size.x / 2, 0.0f, 0.0f);
 		}
 		if (childPos & OC_DOWN) {
 			shift -= vec3(0.0f, size.y / 2, 0.0f);
-		}
-		else {
+		} else {
 			shift += vec3(0.0f, size.y / 2, 0.0f);
 		}
 		if (childPos & OC_BACKWARD) {
 			shift -= vec3(0.0f, 0.0f, size.z / 2);
-		}
-		else {
+		} else {
 			shift += vec3(0.0f, 0.0f, size.z / 2);
 		}
 		return shift;
 	}
 
-	OcTreeNode* getProperChildren(vec3 positon) {
+	OcTreeNode* getProperChildren(vec3 position) {
 		for (OcTreeNode* c : children) {
 			if (c->isInside(position)) {
 				return c;
 			}
+		}
+		throw "Unable to find children of OcTree Node when it should be";
+	}
+
+	void objectMoved(Component* object, vec3 dest) {
+		if (isInside(dest)) {
+			return;
+		}
+		GameObject* go = dynamic_cast<GameObject*>(object);
+		gameObjects.erase(remove(gameObjects.begin(), gameObjects.end(), go), gameObjects.end());
+		transferObject(go, dest);
+	}
+
+	void transferObject(GameObject* object, vec3 dest) {
+		bool inside = isInside(dest);
+		if (!inside) {
+			if (!parent) {
+				return;
+			}
+			parent->transferObject(object, dest);
+			return;
+		}
+		if (!hasBeenPartified) {
+			addObject(object);
+			return;
+		}
+		if (hasBeenPartified) {
+			getProperChildren(dest)->addObject(object);
 		}
 	}
 

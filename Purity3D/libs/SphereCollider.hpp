@@ -35,7 +35,7 @@ public:
 		float toMove = (scaleTwo.x - dist);
 		Transform* tr = getBody()->getTransfrom();
 		vec3 moveVector = vec3(-toMove) * distanceNormal;
-		(*tr).position = (*tr).position - moveVector;
+		tr->setPosition(tr->getRawPosition() - moveVector);
 		vec3 force1 = getBody()->getReflectionVector(distanceNormal);
 		vec3 force1self = getBody()->getSelfVector();
 		vec3 force2 = col->getBody()->getReflectionVector(distanceNormal);
@@ -43,9 +43,5 @@ public:
 		getBody()->setForce(force2 + force1self);
 		col->getBody()->setForce(force1 + force2self);
 		return;
-	}
-
-	void printVec(vec3 v) {
-		cout << v.x << "/" << v.y << "/" << v.z << endl;
 	}
 };

@@ -53,8 +53,8 @@ public:
 		shader->setFloat("material.shininess", shiniess);
 		shader->setVec3("ambient.color", 0.5f, 0.5f, 1.0f);
 		shader->setFloat("ambient.brightness", 1.0f);
-		shader->setFloat("ambient.min", 0.7f);
-		shader->setFloat("ambient.max", 0.7f);
+		shader->setFloat("ambient.min", 0.1f);
+		shader->setFloat("ambient.max", 0.2f);
 		shader->setVec3("viewPos", cam->Position);
 		shader->setMat4("view", view);
 		shader->setMat4("projection", projection);		

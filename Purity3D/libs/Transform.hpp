@@ -11,8 +11,8 @@ class Transform : public Component {
 private:
 	GameObject* go = nullptr;
 	Transform* parent = nullptr;
-public:
 	glm::vec3 position;
+public:
 	glm::vec3 scale;
 	glm::vec3 rotation;
 	
@@ -44,8 +44,13 @@ public:
 		return parent->getPosition() + position;
 	}
 
+	glm::vec3 getRawPosition() {
+		return position;
+	}
+
 	void setPosition(vec3 position) {
 		this->position = position;
+		this->go->objectMoved(position);
 	}
 
 	void setParent(Transform* parent) {

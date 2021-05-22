@@ -51,7 +51,7 @@ public:
 	}
 
 	void onUpdate() {
-		(*transform).position = transform->position + (velocity * Time::getDeltaTime());
+		transform->setPosition(transform->getRawPosition() + (velocity * Time::getDeltaTime()));
 	}
 
 	Transform* getTransfrom() {
