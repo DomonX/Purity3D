@@ -23,6 +23,10 @@ public:
 	vec3 getPosition() {
 		return position;
 	}
+
+	void setPosition(vec3 position) {
+		this->position = position;
+	}
 protected:
 	virtual void feed(std::string index, Shader* shader) {}
 };

@@ -173,32 +173,23 @@
   <ItemGroup>
     <None Include="packages.config" />
     <None Include="shaders\cube.vs" />
-    <None Include="shaders\inversion.fs" />
+    <None Include="shaders\depth.fs.glsl" />
+    <None Include="shaders\depth.gs.glsl" />
+    <None Include="shaders\depth.vs.glsl" />
     <None Include="shaders\light.fs" />
     <None Include="shaders\cube.fs" />
-    <None Include="shaders\morph.vs" />
-    <None Include="shaders\ocTree.fs" />
-    <None Include="shaders\prog.fs" />
-    <None Include="shaders\stretch.vs" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="libs\DrawQueue.h" />
-    <ClInclude Include="libs\Engine.hpp" />
-    <ClInclude Include="libs\Material.hpp" />
-    <ClInclude Include="libs\MotionListener.hpp" />
-    <ClInclude Include="libs\RidgitBody.hpp" />
-    <ClInclude Include="libs\SphereCollider.hpp" />
-    <ClInclude Include="libs\Camera.hpp" />
-    <ClInclude Include="libs\Component.hpp" />
     <ClInclude Include="libs\GameObject.hpp" />
+    <ClInclude Include="libs\Material.hpp" />
+    <ClInclude Include="libs\Camera.hpp" />
     <ClInclude Include="libs\GameState.hpp" />
     <ClInclude Include="libs\Light.hpp" />
     <ClInclude Include="libs\Model.hpp" />
     <ClInclude Include="libs\ObjLoader.hpp" />
-    <ClInclude Include="libs\OcTreeNode.hpp" />
     <ClInclude Include="libs\PointLight.hpp" />
-    <ClInclude Include="libs\RotatorContoller.hpp" />
     <ClInclude Include="libs\shader.hpp" />
+    <ClInclude Include="libs\Skybox.hpp" />
     <ClInclude Include="libs\stb_image.h" />
     <ClInclude Include="libs\Texture.hpp" />
     <ClInclude Include="libs\Time.hpp" />

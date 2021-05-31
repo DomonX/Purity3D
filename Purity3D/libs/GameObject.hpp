@@ -1,100 +1,38 @@
 #pragma once
 
 #include <vector>
-#include "Component.hpp"
-#include "Model.hpp"
-#include "shader.hpp"
+
+#include "Texture.hpp"
 #include "Material.hpp"
-#include "MotionListener.hpp"
+#include "Transform.hpp"
+#include "Shader.hpp"
+#include "Model.hpp"
 
-using namespace std;
-
-class GameObject : public Component {
+class GameObject {
 private:
 	Model* model;
-	vector<Component*> components;
-	vector<GameObject*> children;
-	MotionListener* listener;
-public:
-	GameObject(Model* model) {
+	Material* material;
+	Texture* texture;
+	vector<Transform*> instances;
+public:	
+	GameObject(Model* model, Material* material, Texture* texture) {
 		this->model = model;
+		this->material = material;
+		this->texture = texture;
 	}
 
-	void addComponent(Component* component) {
-		component->getGameObject(this);
-		for (Component* i : components) {
-			component->onGetOtherComponent(i);
-			i->onGetOtherComponent(component);
-		}
-		for (GameObject* i : children) {
-			i->onGetParentComponent(component);
-		}
-		components.push_back(component);		
-		component->onStart();
+	void Instantiate(Transform* transform) {
+		instances.push_back(transform);
 	}
 
-	void onStart() {
-		for (Component* i : components) {
-			i->onStart();
+	void Update(Shader* shader) {
+		glEnable(GL_CULL_FACE);
+		shader->setBool("reverse_normals", false);
+		texture->onUpdate(shader);
+		material->onUpdate(shader);
+		for (Transform* transform : instances) {
+			transform->onUpdate(shader);
+			model->onDraw();
 		}
 	}
-
-	void onUpdate() {
-		model->onUpdate();
-		for (Component* i : components) {
-			i->onUpdate();
-		}
-		for (Component* i : components) {
-			i->onDraw();
-		}
-		model->onDraw();
-
-	}
-
-	void onDelete() {
-		for (Component* i : components) {
-			i->onDelete();
-		}
-		for (Component* i : components) {
-			if (!i->isStatic()) {
-				delete(i);
-			}
-		}
-		components.clear();
-	}
-
-	template<class T> T* getComponent() {
-		T* temp = nullptr;
-		for (Component* component : components) {
-			temp = dynamic_cast<T*>(component);
-			if (temp) {
-				return temp;
-			}
-		}
-		return temp;
-	}
-
-	Model* getModel() {
-		return model;
-	}
-
-	Shader* getShader() {
-		return getMaterial()->getShader();
-	}
-
-	Material* getMaterial() {
-		return getModel()->getMaterial();
-	}
-
-	void setListener(MotionListener* listener) {
-		this->listener = listener;
-	}
-
-	void objectMoved(vec3 pos) {
-		if (!listener) {
-			return;
-		}
-		listener->objectMoved(this, pos);
-	}
-
 };

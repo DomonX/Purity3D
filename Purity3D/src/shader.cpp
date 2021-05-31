@@ -1,8 +1,13 @@
 #include "../libs/shader.hpp"
-Shader::Shader(const char* vertexPath, const char* fragmentPath) {
+Shader::Shader(const char* vertexPath, const char* fragmentPath, const char* geometryPath) {
 
 	unsigned int vertexShader = compileShader(vertexPath, GL_VERTEX_SHADER);
 	unsigned int fragmentShader = compileShader(fragmentPath, GL_FRAGMENT_SHADER);
+	unsigned int geometryShader;
+
+	if (geometryPath) {
+		geometryShader = compileShader(geometryPath, GL_GEOMETRY_SHADER);
+	}
 
 	int success;
 	char infoLog[512];
@@ -11,6 +16,11 @@ Shader::Shader(const char* vertexPath, const char* fragmentPath) {
 
 	glAttachShader(shaderProgram, vertexShader);
 	glAttachShader(shaderProgram, fragmentShader);
+
+	if (geometryPath) {
+		glAttachShader(shaderProgram, geometryShader);
+	}
+
 	glLinkProgram(shaderProgram);
 
 	glGetProgramiv(shaderProgram, GL_LINK_STATUS, &success);

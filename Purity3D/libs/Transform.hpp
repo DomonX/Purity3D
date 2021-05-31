@@ -4,12 +4,12 @@
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
 
-#include "GameObject.hpp";
 #include "shader.hpp";
 
-class Transform : public Component {
+using namespace glm;
+
+class Transform {
 private:
-	GameObject* go = nullptr;
 	Transform* parent = nullptr;
 	glm::vec3 position;
 public:
@@ -22,19 +22,26 @@ public:
 		this->rotation = rotation;
 	}
 
-	void onUpdate() {
+	void onUpdate(Shader* shader) {
+		GameState* gs = GameState::get();
+		Camera* cam = (*gs->getCamera());
+		glm::mat4 view = (*GameState::get()->getCamera())->GetViewMatrix();
+		glm::mat4 projection = glm::perspective(
+			glm::radians(cam->Zoom),
+			(float)gs->SCR_WIDTH / (float)gs->SCR_HEIGHT,
+			0.1f,
+			100.0f
+		);
 		glm::mat4 model = glm::mat4(1.0f);
 		model = translate(model, getPosition());
 		model = glm::rotate(model, rotation.x, glm::vec3(1.0f, 0.0f, 0.0f));
 		model = glm::rotate(model, rotation.y, glm::vec3(0.0f, 1.0f, 0.0f));
 		model = glm::rotate(model, rotation.z, glm::vec3(0.0f, 0.0f, 1.0f));
 		model = glm::scale(model, scale);
-		int modelLoc = glGetUniformLocation(go->getMaterial()->getShader()->getId(), "model");
-		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
-	}
-
-	void getGameObject(Component* go) {
-		this->go = (GameObject*)go;
+		shader->setMat4("model", model);
+		shader->setVec3("viewPos", cam->Position);
+		shader->setMat4("view", view);
+		shader->setMat4("projection", projection);
 	}
 
 	glm::vec3 getPosition() {
@@ -50,7 +57,6 @@ public:
 
 	void setPosition(vec3 position) {
 		this->position = position;
-		this->go->objectMoved(position);
 	}
 
 	void setParent(Transform* parent) {

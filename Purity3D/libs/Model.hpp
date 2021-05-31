@@ -8,7 +8,6 @@
 #include <string>
 
 #include "ObjLoader.hpp"
-#include "Material.hpp"
 
 using namespace std;
 
@@ -20,9 +19,8 @@ protected:
 	unsigned int drawMode = GL_TRIANGLES;
 	unsigned int modelId;
 	unsigned static int modelCounter;
-	Material* material;
 public:
-	Model(string path, Material* material) {
+	Model(string path) {
 
 		vector<Vertice> verticiesVec = ObjLoader().load(path);
 
@@ -44,7 +42,6 @@ public:
 		glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(5 * sizeof(float)));
 		glEnableVertexAttribArray(2);
 
-		this->material = material;
 
 		modelId = Model::modelCounter;
 		Model::modelCounter++;
@@ -54,17 +51,9 @@ public:
 		drawMode = mode;
 	}
 
-	virtual void onUpdate() {
-		material->onUpdate();
-	}
-
 	virtual void onDraw() { 
 		glBindVertexArray(VAO);
 		glDrawArrays(drawMode, 0, modelSize);
-	}
-
-	Material* getMaterial() {
-		return material;
 	}
 
 	unsigned int getId() {

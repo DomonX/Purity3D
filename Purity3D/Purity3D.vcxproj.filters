@@ -45,19 +45,13 @@
     <None Include="shaders\cube.fs">
       <Filter>Pliki zasobów</Filter>
     </None>
-    <None Include="shaders\ocTree.fs">
+    <None Include="shaders\depth.vs.glsl">
       <Filter>Pliki zasobów</Filter>
     </None>
-    <None Include="shaders\stretch.vs">
+    <None Include="shaders\depth.fs.glsl">
       <Filter>Pliki zasobów</Filter>
     </None>
-    <None Include="shaders\morph.vs">
-      <Filter>Pliki zasobów</Filter>
-    </None>
-    <None Include="shaders\prog.fs">
-      <Filter>Pliki zasobów</Filter>
-    </None>
-    <None Include="shaders\inversion.fs">
+    <None Include="shaders\depth.gs.glsl">
       <Filter>Pliki zasobów</Filter>
     </None>
   </ItemGroup>
@@ -66,12 +60,6 @@
       <Filter>Pliki nagłówkowe</Filter>
     </ClInclude>
     <ClInclude Include="libs\stb_image.h">
-      <Filter>Pliki nagłówkowe</Filter>
-    </ClInclude>
-    <ClInclude Include="libs\Component.hpp">
-      <Filter>Pliki nagłówkowe</Filter>
-    </ClInclude>
-    <ClInclude Include="libs\GameObject.hpp">
       <Filter>Pliki nagłówkowe</Filter>
     </ClInclude>
     <ClInclude Include="libs\Camera.hpp">
@@ -84,9 +72,6 @@
       <Filter>Pliki nagłówkowe</Filter>
     </ClInclude>
     <ClInclude Include="libs\GameState.hpp">
-      <Filter>Pliki nagłówkowe</Filter>
-    </ClInclude>
-    <ClInclude Include="libs\RotatorContoller.hpp">
       <Filter>Pliki nagłówkowe</Filter>
     </ClInclude>
     <ClInclude Include="libs\Time.hpp">
@@ -104,25 +89,13 @@
     <ClInclude Include="libs\ObjLoader.hpp">
       <Filter>Pliki nagłówkowe</Filter>
     </ClInclude>
-    <ClInclude Include="libs\OcTreeNode.hpp">
-      <Filter>Pliki nagłówkowe</Filter>
-    </ClInclude>
-    <ClInclude Include="libs\SphereCollider.hpp">
-      <Filter>Pliki nagłówkowe</Filter>
-    </ClInclude>
-    <ClInclude Include="libs\RidgitBody.hpp">
-      <Filter>Pliki nagłówkowe</Filter>
-    </ClInclude>
     <ClInclude Include="libs\Material.hpp">
       <Filter>Pliki nagłówkowe</Filter>
     </ClInclude>
-    <ClInclude Include="libs\Engine.hpp">
+    <ClInclude Include="libs\GameObject.hpp">
       <Filter>Pliki nagłówkowe</Filter>
     </ClInclude>
-    <ClInclude Include="libs\DrawQueue.h">
-      <Filter>Pliki nagłówkowe</Filter>
-    </ClInclude>
-    <ClInclude Include="libs\MotionListener.hpp">
+    <ClInclude Include="libs\Skybox.hpp">
       <Filter>Pliki nagłówkowe</Filter>
     </ClInclude>
   </ItemGroup>

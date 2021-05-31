@@ -10,7 +10,6 @@
 #include <sstream>
 #include <iostream>
 
-#include "Component.hpp"
 #include "Camera.hpp"
 #include "GameState.hpp"
 
@@ -18,7 +17,7 @@ class Shader {
 private:
 	unsigned int id;
 public:
-	Shader(const char* vertexPath, const char* fragmentPath);
+	Shader(const char* vertexPath, const char* fragmentPath, const char* geometryPath = nullptr);
 	void use();
 	void setBool(const std::string &name, bool value) const;
 	void setInt(const std::string& name, int value) const;

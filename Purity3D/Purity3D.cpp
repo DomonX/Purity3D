@@ -13,15 +13,15 @@
 #include "libs/Camera.hpp"
 #include "libs/Texture.hpp"
 #include "libs/Transform.hpp"
-#include "libs/GameObject.hpp"
 #include "libs/GameState.hpp"
-#include "libs/RotatorContoller.hpp"
 #include "libs/Time.hpp"
 #include "libs/PointLight.hpp"
 #include "libs/ObjLoader.hpp"
-#include "libs/OcTreeNode.hpp"
-#include "libs/RidgitBody.hpp"
-#include "libs/SphereCollider.hpp"
+#include "libs/Model.hpp"
+#include "libs/Material.hpp"
+
+#include "libs/GameObject.hpp"
+#include "libs/Skybox.hpp"
 
 void framebuffer_size_callback(GLFWwindow* window, int width, int height);
 void mouse_callback(GLFWwindow* window, double xpos, double ypos);
@@ -39,11 +39,6 @@ Camera** cam;
 float lastX;
 float lastY;
 bool firstMouse = true;
-Model* cube;
-Model* sphere;
-Shader* currentShader;
-Material* material;
-Texture* tex;
 
 float deltaTime = 0.0f;
 float lastFrame = 0.0f;
@@ -76,22 +71,6 @@ Transform* createTransform(int x, int y, int z) {
 	return new Transform(vec3(2.0f * x, 2.0f * y, 2.0f * z), vec3(1.0f, 1.0f, 1.0f), vec3(0.0f, 0.0f, 0.0f));
 }
 
-GameObject* createCube(int x, int y, int z) {
-	GameObject* obj = new GameObject(cube);
-	obj->addComponent(tex);
-	obj->addComponent(createTransform(x, y, z));
-	return obj;
-}
-
-GameObject* createSphere(float x, float y, float z, float elasticity = 0.0f) {
-	GameObject* sphereO = new GameObject(sphere);
-	sphereO->addComponent(tex);
-	sphereO->addComponent(new Transform(vec3(2.0f * x, 2.0f * y, 2.0f * z), vec3(1.0f, 1.0f, 1.0f), vec3(0.0f, 0.0f, 0.0f)));
-	sphereO->addComponent(new RidgitBody(elasticity));
-	sphereO->addComponent(new SphereCollider());
-	return sphereO;
-}
-
 
 int main() {
 	init();
@@ -117,7 +96,7 @@ int main() {
 
 	glEnable(GL_BLEND);
 
-	//glEnable(GL_CULL_FACE);
+	glEnable(GL_CULL_FACE);
 	//glCullFace(GL_BACK);
 	//glFrontFace(GL_CCW);
 
@@ -128,92 +107,109 @@ int main() {
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 
+	const unsigned int SHADOW_WIDTH = 1024, SHADOW_HEIGHT = 1024;
+	unsigned int depthMapFBO;
+	glGenFramebuffers(1, &depthMapFBO);
+	// create depth cubemap texture
+	unsigned int depthCubemap;
+	glGenTextures(1, &depthCubemap);
+	glBindTexture(GL_TEXTURE_CUBE_MAP, depthCubemap);
+	for (unsigned int i = 0; i < 6; ++i)
+		glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, GL_DEPTH_COMPONENT, SHADOW_WIDTH, SHADOW_HEIGHT, 0, GL_DEPTH_COMPONENT, GL_FLOAT, NULL);
+	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
+	// attach depth texture as FBO's depth buffer
+	glBindFramebuffer(GL_FRAMEBUFFER, depthMapFBO);
+	glFramebufferTexture(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, depthCubemap, 0);
+	glDrawBuffer(GL_NONE);
+	glReadBuffer(GL_NONE);
+	glBindFramebuffer(GL_FRAMEBUFFER, 0);
+
 	gs = GameState::get();
 	cam = gs->getCamera();
 
-	currentShader = new Shader("shaders/cube.vs", "shaders/cube.fs");
-	material = new Material(currentShader);
+	Shader* cubeShader = new Shader("shaders/cube.vs", "shaders/cube.fs");
+	cubeShader->use();
+	cubeShader->setInt("texture1", 0);
+	cubeShader->setInt("depthMap", 1);
+	Shader* depthShader = new Shader("shaders/depth.vs.glsl", "shaders/depth.fs.glsl", "shaders/depth.gs.glsl");
 
-	cube = new Model("assets/cube.obj", material);
-	sphere = new Model("assets/sphere.obj", material);
+	Material* material = new Material();
 
-	tex = new Texture("assets/brick.jpg");
+	Model* cube = new Model("assets/cube.obj");
+	Model* sphere = new Model("assets/sphere.obj");
 
-	vector<GameObject*> objs;
+	Texture *tex = new Texture("assets/brick.jpg");
 
 	vector<PointLight*> lights;
+	vec3 lightPosition = vec3(1.0f, 6.0f, 1.0f);
+	PointLight* light = new PointLight(lightPosition);
+	light->brightness = 5.0f;
 
-	PointLight* light = new PointLight(vec3(6.0f, 10.0f, 6.0f));
+	GameObject* cubeObject = new GameObject(cube, material, tex);
+	cubeObject->Instantiate(new Transform(vec3(1.0f), vec3(1.0f), vec3(0.0f)));
+	cubeObject->Instantiate(new Transform(vec3(1.8f, 1.5f, 4.0f), vec3(1.0f), vec3(0.0f)));
 
-	lights.push_back(light);
-	lights.push_back(new PointLight(vec3(2.0f, 3.0f, 1.0f)));
-	lights.push_back(new PointLight(vec3(6.0f, 4.0f, 5.0f)));
-
-	int sx = -10;
-	int sy = -10;
-	int ex = 10;
-	int ey = 10;
-
-	OcTreeNode* ocT = new OcTreeNode(glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(10.0f, 10.0f, 10.0f));
-	ocT->partify();
-	ocT->children[OC_LEFT | OC_UP | OC_BACKWARD]->partify();
-	ocT->children[OC_LEFT | OC_UP | OC_BACKWARD]->children[OC_LEFT | OC_DOWN | OC_FORWARD]->partify();
-
-	for (int i = sx; i < ex; i++) {
-		for (int j = sy; j < ey; j++) {	
-			ocT->addObject(createCube(i, 0, j));
-		}
-	}	
-
-	GameObject* cubeO = new GameObject(cube);
-	cubeO->addComponent(tex);
-	cubeO->addComponent(new Transform(vec3(2.0f, 2.5f, 1.5f), vec3(1.0f, 1.0f, 1.0f), vec3(0.0f, 0.0f, 0.0f)));
-	RidgitBody* body = new RidgitBody();
-	cubeO->addComponent(body);
-	body->addForce(vec3(0.0f, 0.0f, -1.4f));
-	ocT->addObject(cubeO);
-
-	GameObject* sphere = createSphere(-7, 1.2, 1, 0.0f);
-	RidgitBody* sBody = sphere->getComponent<RidgitBody>();
-	SphereCollider* col = sphere->getComponent<SphereCollider>();
-	sBody->addForce(vec3(5.51f, 0.0f, 0.0f));
-	ocT->addObject(sphere);
-
-	GameObject* sphere2 = createSphere(5, 1, 1, 0.2f);
-	RidgitBody* sBody2 = sphere2->getComponent<RidgitBody>();
-	SphereCollider* col2 = sphere2->getComponent<SphereCollider>();
-	sBody2->addForce(vec3(-0.51f, 0.0f, 0.0f));
-	ocT->addObject(sphere2);
-
-	GameObject* sphere3 = createSphere(4, 1.3, 4.3, 0.4f);
-	RidgitBody* sBody3 = sphere3->getComponent<RidgitBody>();
-	SphereCollider* col3 = sphere3->getComponent<SphereCollider>();
-	sBody3->addForce(vec3(0.0f, 0.0f, -0.90f));
-	ocT->addObject(sphere3);
+	Skybox* sky = new Skybox(cube, material, tex, new Transform(vec3(0.0f), vec3(10.0f), vec3(0.0f)));
 
 	while (!glfwWindowShouldClose(window)) {
 		float currentFrame = glfwGetTime();
 		deltaTime = currentFrame - lastFrame;
 		lastFrame = currentFrame;
 		Time::get()->setDeltaTime(deltaTime);
-		glClear(GL_DEPTH_BUFFER_BIT);
 
 		processInput(window);
 
-		glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
+		// 0. create depth cubemap transformation matrices
+		// -----------------------------------------------
+		float near_plane = 1.0f;
+		float far_plane = 100.0f;
+		glm::mat4 shadowProj = glm::perspective(glm::radians(90.0f), (float)SHADOW_WIDTH / (float)SHADOW_HEIGHT, near_plane, far_plane);
+		std::vector<glm::mat4> shadowTransforms;
+		vec3 lightPos = light->getPosition();
+		shadowTransforms.push_back(shadowProj * glm::lookAt(lightPos, lightPos + glm::vec3(1.0f, 0.0f, 0.0f), glm::vec3(0.0f, -1.0f, 0.0f)));
+		shadowTransforms.push_back(shadowProj * glm::lookAt(lightPos, lightPos + glm::vec3(-1.0f, 0.0f, 0.0f), glm::vec3(0.0f, -1.0f, 0.0f)));
+		shadowTransforms.push_back(shadowProj * glm::lookAt(lightPos, lightPos + glm::vec3(0.0f, 1.0f, 0.0f), glm::vec3(0.0f, 0.0f, 1.0f)));
+		shadowTransforms.push_back(shadowProj * glm::lookAt(lightPos, lightPos + glm::vec3(0.0f, -1.0f, 0.0f), glm::vec3(0.0f, 0.0f, -1.0f)));
+		shadowTransforms.push_back(shadowProj * glm::lookAt(lightPos, lightPos + glm::vec3(0.0f, 0.0f, 1.0f), glm::vec3(0.0f, -1.0f, 0.0f)));
+		shadowTransforms.push_back(shadowProj * glm::lookAt(lightPos, lightPos + glm::vec3(0.0f, 0.0f, -1.0f), glm::vec3(0.0f, -1.0f, 0.0f)));
+
+		light->setPosition(lightPosition + vec3(sin(glfwGetTime()), 0.0, 0.0));
+
+		// 1. render scene to depth cubemap
+		// --------------------------------
+		glViewport(0, 0, SHADOW_WIDTH, SHADOW_HEIGHT);
+		glBindFramebuffer(GL_FRAMEBUFFER, depthMapFBO);
+		glClear(GL_DEPTH_BUFFER_BIT);
+		depthShader->use();
+		for (unsigned int i = 0; i < 6; ++i)
+			depthShader->setMat4("shadowMatrices[" + std::to_string(i) + "]", shadowTransforms[i]);
+		depthShader->setFloat("far_plane", far_plane);
+		depthShader->setVec3("lightPos", lightPos);
+		cubeObject->Update(depthShader);
+		sky->Update(depthShader);
+		glBindFramebuffer(GL_FRAMEBUFFER, 0);
+
+		// ---- Render scene ------
+		glBindFramebuffer(GL_FRAMEBUFFER, 0);
+		glViewport(0, 0, SCR_WIDTH, SCR_HEIGHT);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-		currentShader->use();
-		currentShader->setInt("pointLightsCounter", lights.size());
-		float val = (sin(glfwGetTime()) + 1) / 2;
-		light->setColor(vec3(0.0f, 1 - val, val));
-		light->brightness = 2.0f + 3 * val;
-		for (int i = 0; i < lights.size(); i++) {
-			lights.at(i)->run(i, currentShader);
-		}
-		col->getCollision(col2);
-		col->getCollision(col3);
-		col2->getCollision(col3);
-		ocT->onUpdate();
+		cubeShader->use();
+		cubeShader->setInt("far_plane", far_plane);
+
+		// Setup lights
+		cubeShader->setInt("pointLightsCounter", 1);
+		light->run(0, cubeShader);
+
+		glActiveTexture(GL_TEXTURE1);
+		glBindTexture(GL_TEXTURE_CUBE_MAP, depthCubemap);
+
+		cubeObject->Update(cubeShader);
+		sky->Update(cubeShader);
+
 		glfwSwapBuffers(window);
 		glfwPollEvents();
 	}

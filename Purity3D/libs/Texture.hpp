@@ -1,35 +1,23 @@
 #pragma once
 #include <string>
-#include "stb_image.h"
 
-#include "Component.hpp"
+#include "stb_image.h"
 #include "shader.hpp"
-#include "GameObject.hpp"
+
 using namespace std;
-class Texture : public Component {
+class Texture {
 private:
 	string path1;
 	unsigned int texture1;
-	GameObject* go = nullptr;
 public:
 	Texture(string path1) {
 		this->path1 = path1;
 		texture1 = createTexture(path1.c_str());
 	}
 
-	void onUpdate() {
+	void onUpdate(Shader* shader) {
 		glActiveTexture(GL_TEXTURE0);
 		glBindTexture(GL_TEXTURE_2D, texture1);
-	}
-
-	void getGameObject(Component* go) {
-		this->go = (GameObject*)go;
-		this->go->getMaterial()->getShader()->use();
-		this->go->getMaterial()->getShader()->setInt("texture1", 0);
-	}
-
-	bool isStatic() {
-		return true;
 	}
 
 private:

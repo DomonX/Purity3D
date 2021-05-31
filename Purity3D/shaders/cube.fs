@@ -7,6 +7,9 @@ in vec3 FragPos;
 
 uniform vec3 viewPos;
 uniform sampler2D texture1;
+uniform samplerCube depthMap;
+
+uniform float far_plane;
 
 struct Material {
     vec3 diffuse;
@@ -69,38 +72,36 @@ vec3 calculatePointLight(PointLight light, vec3 norm, vec3 viewDir) {
 	return ( diffuse + specular) * light.brightness;
 }
 
-struct DirLight {
-    vec3 direction;
-	
-    vec3 ambient;
-    vec3 diffuse;
-    vec3 specular;
-};
-
-vec3 calculateDirLight(DirLight light, vec3 normal, vec3 viewDir)
+float ShadowCalculation(vec3 fragPos)
 {
-    vec3 lightDir = normalize(-light.direction);
-    float diff = max(dot(normal, lightDir), 0.0);
-    vec3 reflectDir = reflect(-lightDir, normal);
-    float spec = pow(max(dot(viewDir, reflectDir), 0.0), material.shininess);
-    vec3 diffuse = light.diffuse * diff * material.diffuse;
-    vec3 specular = light.specular * spec * material.specular;
-    return (diffuse + specular);
+    vec3 fragToLight = fragPos - pointLights[0].position;
+    float closestDepth = texture(depthMap, fragToLight).r;
+    closestDepth *= far_plane;
+    float currentDepth = length(fragToLight);
+    float bias = 0.05;
+    float shadow = currentDepth -  bias > closestDepth ? 1.0 : 0.0;
+    return shadow;
 }
 
-#define MAX_DIR_LIGHTS 4
-uniform DirLight[MAX_DIR_LIGHTS] dirLights;
-uniform int dirLightsCounter;
 
 void main() {
-	vec3 result = calculateAmbient();
-	vec3 viewDir = normalize(viewPos - FragPos);
-	vec3 norm = normalize(Normal);
-	for(int i = 0; i < pointLightsCounter; i++) {
-		result += calculatePointLight(pointLights[i], norm, viewDir);
+	//vec3 viewDir = normalize(viewPos - FragPos);
+	//vec4 color = texture(texture1, TexCoord);
+	//vec3 norm = normalize(Normal);
+	//vec3 result = vec3(0.0);
+	//for(int i = 0; i < pointLightsCounter; i++) {
+	//	result += calculatePointLight(pointLights[i], norm, viewDir);
+	//}
+   
+    //float shadow = ShadowCalculation(FragPos);
+
+	// result = result * shadow;
+	//result += calculateAmbient();
+	//FragColor = color * vec4(result, 1.0);
+	if(far_plane == 0.0) {
+		FragColor = vec4(1.0, 0.0, 0.0, 1.0);
+	} else {
+		FragColor = vec4(0.0, 1.0, 0.0, 1.0);
 	}
-	for(int i = 0; i < dirLightsCounter; i++) {
-		result += calculateDirLight(dirLights[i], norm, viewDir);
-	}
-	FragColor = texture(texture1, TexCoord) * vec4(result, 1.0);
+	// FragColor = vec4(result, 1.0);
 }
