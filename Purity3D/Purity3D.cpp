@@ -43,6 +43,8 @@ bool firstMouse = true;
 float deltaTime = 0.0f;
 float lastFrame = 0.0f;
 
+vec3 wallPos;
+
 void framebuffer_size_callback(GLFWwindow* window, int width, int height) {
 	glViewport(0, 0, width, height);
 }
@@ -58,6 +60,14 @@ void processInput(GLFWwindow* window) {
 		(*cam)->ProcessKeyboard(LEFT, deltaTime);
 	if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
 		(*cam)->ProcessKeyboard(RIGHT, deltaTime);
+	if (glfwGetKey(window, GLFW_KEY_RIGHT) == GLFW_PRESS)
+		wallPos.x += 1.0f * deltaTime;
+	if (glfwGetKey(window, GLFW_KEY_LEFT) == GLFW_PRESS)
+		wallPos.x -= 1.0f * deltaTime;
+	if (glfwGetKey(window, GLFW_KEY_UP) == GLFW_PRESS)
+		wallPos.z += 1.0f * deltaTime;
+	if (glfwGetKey(window, GLFW_KEY_DOWN) == GLFW_PRESS)
+		wallPos.z -= 1.0f * deltaTime;
 }
 
 void init() {
@@ -137,6 +147,8 @@ int main() {
 	cubeShader->setInt("depthMap", 1);
 	Shader* depthShader = new Shader("shaders/depth.vs.glsl", "shaders/depth.fs.glsl", "shaders/depth.gs.glsl");
 
+	Shader* lightShader = new Shader("shaders/cube.vs", "shaders/light.fs");
+
 	Material* material = new Material();
 
 	Model* cube = new Model("assets/cube.obj");
@@ -149,9 +161,12 @@ int main() {
 	PointLight* light = new PointLight(lightPosition);
 	light->brightness = 5.0f;
 
+	wallPos = vec3(0.0f, 6.5f, 0.0f);
+
 	GameObject* cubeObject = new GameObject(cube, material, tex);
 	cubeObject->Instantiate(new Transform(vec3(1.0f), vec3(1.0f), vec3(0.0f)));
 	cubeObject->Instantiate(new Transform(vec3(1.8f, 1.5f, 4.0f), vec3(1.0f), vec3(0.0f)));
+	cubeObject->Instantiate(new Transform(wallPos, vec3(1.5f, 1.0f, 0.8f), vec3(0.0f)));
 
 	Skybox* sky = new Skybox(cube, material, tex, new Transform(vec3(0.0f), vec3(10.0f), vec3(0.0f)));
 
@@ -165,7 +180,7 @@ int main() {
 
 		// 0. create depth cubemap transformation matrices
 		// -----------------------------------------------
-		float near_plane = 1.0f;
+		float near_plane = 0.01f;
 		float far_plane = 100.0f;
 		glm::mat4 shadowProj = glm::perspective(glm::radians(90.0f), (float)SHADOW_WIDTH / (float)SHADOW_HEIGHT, near_plane, far_plane);
 		std::vector<glm::mat4> shadowTransforms;
@@ -178,6 +193,9 @@ int main() {
 		shadowTransforms.push_back(shadowProj * glm::lookAt(lightPos, lightPos + glm::vec3(0.0f, 0.0f, -1.0f), glm::vec3(0.0f, -1.0f, 0.0f)));
 
 		light->setPosition(lightPosition + vec3(sin(glfwGetTime()), 0.0, 0.0));
+
+		(*cubeObject->Instance(0))->rotation = vec3(glfwGetTime(), 0.0, 0.0);
+		(*cubeObject->Instance(2))->setPosition(wallPos);
 
 		// 1. render scene to depth cubemap
 		// --------------------------------
@@ -198,15 +216,19 @@ int main() {
 		glViewport(0, 0, SCR_WIDTH, SCR_HEIGHT);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 		cubeShader->use();
-		cubeShader->setInt("far_plane", far_plane);
+		cubeShader->setFloat("far_plane", far_plane);
 
 		// Setup lights
+		lightShader->use();
+		light->Update(lightShader);
+		sphere->onDraw();
+
+		cubeShader->use();
 		cubeShader->setInt("pointLightsCounter", 1);
 		light->run(0, cubeShader);
-
 		glActiveTexture(GL_TEXTURE1);
 		glBindTexture(GL_TEXTURE_CUBE_MAP, depthCubemap);
-
+		
 		cubeObject->Update(cubeShader);
 		sky->Update(cubeShader);
 

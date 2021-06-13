@@ -80,28 +80,23 @@ float ShadowCalculation(vec3 fragPos)
     float currentDepth = length(fragToLight);
     float bias = 0.05;
     float shadow = currentDepth -  bias > closestDepth ? 1.0 : 0.0;
+    FragColor = vec4(vec3(closestDepth / far_plane), 1.0);
     return shadow;
 }
 
 
 void main() {
-	//vec3 viewDir = normalize(viewPos - FragPos);
-	//vec4 color = texture(texture1, TexCoord);
-	//vec3 norm = normalize(Normal);
-	//vec3 result = vec3(0.0);
-	//for(int i = 0; i < pointLightsCounter; i++) {
-	//	result += calculatePointLight(pointLights[i], norm, viewDir);
-	//}
-   
-    //float shadow = ShadowCalculation(FragPos);
-
-	// result = result * shadow;
-	//result += calculateAmbient();
-	//FragColor = color * vec4(result, 1.0);
-	if(far_plane == 0.0) {
-		FragColor = vec4(1.0, 0.0, 0.0, 1.0);
-	} else {
-		FragColor = vec4(0.0, 1.0, 0.0, 1.0);
+	vec3 viewDir = normalize(viewPos - FragPos);
+	vec4 color = texture(texture1, TexCoord);
+	vec3 norm = normalize(Normal);
+	vec3 result = vec3(0.0);
+	for(int i = 0; i < pointLightsCounter; i++) {
+		result += calculatePointLight(pointLights[i], norm, viewDir);
 	}
-	// FragColor = vec4(result, 1.0);
+   
+    float shadow = ShadowCalculation(FragPos);
+
+	result = result * (1.0 - shadow);
+	result += calculateAmbient();
+	FragColor = color * vec4(result, 1.0);
 }

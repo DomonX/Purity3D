@@ -21,6 +21,10 @@ public:
 		this->texture = texture;
 	}
 
+	Transform** Instance(int index) {
+		return &instances.at(index);
+	}
+
 	void Instantiate(Transform* transform) {
 		instances.push_back(transform);
 	}
